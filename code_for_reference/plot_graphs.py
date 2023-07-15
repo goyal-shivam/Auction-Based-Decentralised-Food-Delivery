@@ -30,6 +30,8 @@ N_BINS = 20
 
 with open(f"NUM_BOYS_{NUM_BOYS}_BIKE_SPEED_{BIKE_SPEED}_decent.pkl", 'rb') as file:
     (x,y) = pkl.load(file)
+    # x = x[40800:41800]
+    # y = y[40800:41800]
 
 with open(f"NUM_BOYS_{NUM_BOYS}_BIKE_SPEED_{BIKE_SPEED}_ORDER_DATA.pkl", 'rb') as file:
     ORDER_DATA = pkl.load(file)
@@ -41,9 +43,12 @@ plt.plot(x,y, color='#0652DD')
 # plt.plot(x,y, color='blue')
 # plt.bar(x,y,color='blue')
 plt.axhline(np.average(y),0, np.amax(x), color='#12CBC4')
+print(f'\nDecentralised average queue length is {np.average(y)}\n')
 
 with open(f"NUM_BOYS_{NUM_BOYS}_BIKE_SPEED_{BIKE_SPEED}_NUM_BOYS_PER_COMPANY_{NUM_BOYS_PER_COMPANY}_NUM_OF_COMPANIES_{NUM_OF_COMPANIES}_centralised.pkl", 'rb') as file:
     (x,y) = pkl.load(file)
+    x = x[40800:41800]
+    y = y[40800:41800]
 
 plt.plot(x,y, color='#6F1E51')
 # plt.bar(x,y)
@@ -51,13 +56,14 @@ plt.plot(x,y, color='#6F1E51')
 # plt.plot(x,y, color='blue')
 # plt.bar(x,y,color='blue')
 plt.axhline(np.average(y),0, np.amax(x), color='#ED4C67')
+print(f'Centralised average queue length is {np.average(y)}')
 
 plt.title(f"NUM_BOYS = {NUM_BOYS}, BIKE_SPEED = {BIKE_SPEED}, NUM_BOYS_PER_COMPANY = {NUM_BOYS_PER_COMPANY}, NUM_OF_COMPANIES = {NUM_OF_COMPANIES}")
-plt.xlabel("Time into Simulation")
+plt.xlabel("Time into Simulation (mins)")
 plt.ylabel("Waiting Queue Length")
 
 plt.legend(["Decentralised", "Average Decentralised", "Centralised", "Average Centralised"])
-plt.savefig("test.svg",format='svg',dpi=300, bbox_inches=Bbox([[0, 0], [100000, 100000]]),pad_inches=1)
+# plt.savefig("test.png",format='png',dpi=300, bbox_inches=Bbox([[0, 0], [100000, 100000]]),pad_inches=1)
 
 
 dist = []
@@ -106,16 +112,22 @@ for i in range(1,len(ORDER_DATA)):
 plt.figure('Distance Travelled vs Time')
 plt.plot(sum_dist2)
 plt.xlabel("Number of Orders")
-plt.ylabel("Total Distance travelled by Delivery boys")
+plt.ylabel("Total Distance travelled by Delivery boys (km)")
 plt.legend(["Decentralised", "Centralised"])
 
 
 plt.figure('Total wait time vs Time')
 plt.xlabel("Number of Orders")
-plt.ylabel("Total Wait time of all customers involved")
+plt.ylabel("Total Wait time of all customers involved (mins)")
 plt.plot(sum_wait2)
 plt.legend(["Decentralised", "Centralised"])
 
+
+print(f'\nTotal Wait Times\nDecentralised - {sum_wait[-1]} mins and Centralised - {sum_wait2[-1]} mins\n')
+print(f'Total Distance Travelled\nDecentralised - {sum_dist[-1]} kms and Centralised - {sum_dist2[-1]} kms\n')
+
+print(f'\nAverage Wait Times\nDecentralised - {sum_wait[-1]/len(sum_wait)} mins and Centralised - {sum_wait2[-1]/len(sum_wait2)} mins\n')
+print(f'Average Distance Travelled\nDecentralised - {sum_dist[-1]/len(sum_dist)} kms and Centralised - {sum_dist2[-1]/len(sum_dist2)} kms\n')
 
 # fig, axs = plt.subplots()
 
@@ -123,19 +135,19 @@ plt.legend(["Decentralised", "Centralised"])
 
 # axs.hist(y, bins = n_bins,color='b')
 
-bins = np.linspace(0, 15000, 20)
-bins2 = np.linspace(0, 1500, 20)
+bins = np.linspace(0, 1000, 20)
+bins2 = np.linspace(0, 200, 20)
 
 plt.style.use('seaborn-deep')
 plt.figure('Distance Histogram')
 plt.hist([dist, dist2], bins, label=['Decentralised', 'Centralised'])
-plt.xlabel("Distance")
+plt.xlabel("Distance (km)")
 plt.ylabel("Frequency")
 plt.legend(loc='upper right')
 
 plt.figure('Wait Time Histogram')
 plt.hist([wait, wait2], bins2, label=['Decentralised', 'Centralised'])
-plt.xlabel("Wait Time")
+plt.xlabel("Wait Time (mins)")
 plt.ylabel("Frequency")
 plt.legend(loc='upper right')
 
