@@ -9,3 +9,30 @@ min and max bid is same for all riders for a particular order, but machine predi
 
 in manual rider selection - check that riders don't demand unnecessarily high bid and present themselves as very good riders, and then you consider good riders are those who have high bid. 
 
+
+
+list of graphs
+    average queue length
+    total distance travelled vs number of orders served
+    total wait time of customers vs number of orders served
+    distance histogram
+    wait time histogram 
+
+
+SIMULATING RIDER BEHAVIOUR WHILE BIDDING
+for calculating 1st, 2nd and 3rd iteration bid of the rider, input to the function is rider rating, minimum and maximum bid by the restaurant, optionally (number of orders served by the rider)
+    proportional to rating, number of orders served, min & max bid
+
+
+SIMULATING RESTAURANT OWNER BEHAVIOUR WHILE BIDDING
+dependent on value of the food order
+discussed with uday
+
+
+
+add order price to the dataset based on the sensitivity of the order, breakfast, lunch, snacks etc. - find out a maximum price of the order say 3000 rs
+
+
+SIMULATING CUSTOMER RATING
+dependent on '''wait time'''
+FAALTU - freshness - temperature of food, politeness of rider behaviour
