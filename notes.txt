@@ -1,0 +1,11 @@
+use k nearest neighbours - maybe make a graph also with k as parameter
+
+fairness of earnings of various riders
+
+
+
+how to generate minimum and maximum bid for delivering the order?
+min and max bid is same for all riders for a particular order, but machine predicted bid is dependent on the order, and the rating of the rider
+
+in manual rider selection - check that riders don't demand unnecessarily high bid and present themselves as very good riders, and then you consider good riders are those who have high bid. 
+
