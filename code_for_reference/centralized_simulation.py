@@ -31,15 +31,18 @@ def dist(lat1, long1, lat2, long2):
 def man_dist(lat1, long1, lat2, long2):
     return dist(lat1, long1, lat2, long1) + dist(lat2, long1, lat2, long2)
 
-def get_index_of_nearest_boy(lat,long,company):
-    min_dist = 1000000000
+def get_index_of_nearest_boy(lat,long,company,time_now):
+    min_time = 1000000000
     min_ind = -1
     for i in range(company*NUM_BOYS_PER_COMPANY,(company+1)*NUM_BOYS_PER_COMPANY,1):
+        new_time = BOYS[i]['busy']
         if(BOYS[i]['busy'] == 0):
-            new_dist = man_dist(lat, long, BOYS[i]['lat'], BOYS[i]['long'])
-            if(min_dist > new_dist):
-                min_ind = i
-                min_dist = new_dist
+            new_time += time_now
+
+        new_time = ceil(man_dist(lat, long, BOYS[i]['lat'], BOYS[i]['long'])/BIKE_SPEED*60)
+        if(min_time > new_time):
+            min_ind = i
+            min_time = new_time
 
     return min_ind
 
@@ -80,7 +83,7 @@ def customer_generator(env, companies):
         else:
             t = (data['order_pick'][i]-data['order_pick'][i-1]).total_seconds()/60
         
-        yield env.timeout(t)
+        yield env.timeout(ceil(t))
         c = Customer(env=env, biker=companies[company_allot[i]], name=f'Customer {i+1}', res_long=data['Restaurant_longitude'][i],res_lat=data['Restaurant_latitude'][i], lat=data['Delivery_location_latitude'][i], long=data['Delivery_location_longitude'][i], company=company_allot[i])
         env.process(c.action())
 
@@ -127,19 +130,23 @@ class Customer:
             yield req
 
             # find out the nearest biker and wait for him to come to me
-            self.bike_ind = get_index_of_nearest_boy(self.res_lat, self.res_long, self.company)
-            BOYS[self.bike_ind]['busy'] = 1
+            self.bike_ind = get_index_of_nearest_boy(self.res_lat, self.res_long, self.company,self.env.now)
+            
 
             dist1 = man_dist(BOYS[self.bike_ind]['lat'], BOYS[self.bike_ind]['long'], self.res_lat, self.res_long)
             dist2 = man_dist(self.lat, self.long, self.res_lat, self.res_long)
 
-            # waiting for nearest biker to go to the restaurant
-            yield self.env.timeout(ceil(dist1/BIKE_SPEED))
-
-            yield self.env.timeout(ceil(dist2/BIKE_SPEED))
-
             BOYS[self.bike_ind]['lat'] = self.lat
             BOYS[self.bike_ind]['long'] = self.long
+
+            BOYS[self.bike_ind]['busy'] = self.env.now + ceil(dist1/BIKE_SPEED*60) + ceil(dist2/BIKE_SPEED*60)
+
+
+            # waiting for nearest biker to go to the restaurant
+            yield self.env.timeout(ceil(dist1/BIKE_SPEED*60))
+
+            yield self.env.timeout(ceil(dist2/BIKE_SPEED*60))
+
             BOYS[self.bike_ind]['busy'] = 0
 
             NUM_CUSTOMERS -= 1
