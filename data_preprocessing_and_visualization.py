@@ -39,7 +39,7 @@ for i in range(len(data)):
     green_date_set.add(data['order_place'].iloc[i].replace(
             hour=18, minute=0, second=0))
 
-plt.figure('Histogram showing frequency of orders in Mumbai every 6 hours')
+fig = plt.figure('Histogram showing frequency of orders in Mumbai every 6 hours')
 plt.xlabel("Date (divided in 6hr slots)")
 plt.ylabel("Number of orders")
 
@@ -53,16 +53,7 @@ for k in green_date_set:
     plt.axvline(x=k, color='#55A868', linewidth=1)
 
 
-# print(data['order_place'].iloc[0])
-# print(data['order_place'].iloc[0].replace(
-#     hour=0,
-#     minute=0,
-#     second=0
-# ))
-
-# pprint(date_set)
-
-# with open('mumbai_orders_histogram.pkl', 'wb'):
-#     pickle.dump(fig,file)
+with open('mumbai_orders_histogram.pkl', 'wb') as file:
+    pickle.dump(fig,file)
 
 plt.show()
