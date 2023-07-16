@@ -17,10 +17,11 @@ for i in range(len(data)):
 for i in range(len(data)):
     people.add((data['Delivery_location_latitude'][i], data['Delivery_location_longitude'][i]))
 
-# center = (19.091458, 72.827808)
-# map = folium.Map(location=center, zoom_start=12)
-map = folium.Map(location=center, zoom_start=1)
+center = (19.091458, 72.827808)
+map = folium.Map(location=center, zoom_start=12)
+# map = folium.Map(location=center, zoom_start=1)
 
+# Plot restaurants with red marker on the map
 for i in location:
     x = list(i)
     folium.Marker(
@@ -30,6 +31,7 @@ for i in location:
         icon=folium.Icon(color="red", icon="glyphicon-remove-circle")
     ).add_to(map)
 
+# Plot client locations with blue marker on the map
 for i in people:
     x = list(i)
     folium.Marker(
