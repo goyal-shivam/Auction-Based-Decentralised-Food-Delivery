@@ -20,7 +20,7 @@ data = data[
             (data['Delivery_location_longitude'] >= MIN_LONG)
         ]
 
-'''
+# '''
 date_set = set()
 green_date_set = set()
 
@@ -57,35 +57,45 @@ for k in green_date_set:
 with open('mumbai_orders_histogram.pkl', 'wb') as file:
     pickle.dump(fig,file)
 
-'''
+# '''
 
 # ----------------------------------------------------------------------------------------
-count = 0
+count2 = 0
 # shifting all orders to 8am to 10pm time
 for i in range(len(data)):
     if(
-        # data['order_pick'].iloc[i].hour >= 22 or 
-        # data.at[i,'Time_taken(min)'] >= 22 or 
         data.iat[i,9].hour >= 22 or 
-        # data['order_pick'].iloc[i].hour < 8 or
         data.iat[i,9].hour < 8 or
-        # data['order_place'].iloc[i].hour >= 22 or 
-        data['order_place'].iloc[i].hour >= 22 or 
-        data['order_place'].iloc[i].hour < 8 or
-        data['order_delivered'].iloc[i].hour >= 22 or 
-        data['order_delivered'].iloc[i].hour < 8
+        data.iat[i,10].hour >= 22 or 
+        data.iat[i,10].hour < 8 or
+        data.iat[i,11].hour >= 22 or 
+        data.iat[i,11].hour < 8
     ):
-        # data['order_pick'].iloc[i] += pd.Timedelta(10, 'hours')
-        # data.at[i,'order_pick'] += pd.Timedelta(10, 'hours')
-        data.iat[i,9] += pd.Timedelta(10, 'hours')
-        data['order_place'].iloc[i] += pd.Timedelta(10, 'hours')
-        data['order_delivered'].iloc[i] += pd.Timedelta(10, 'hours')
+        data.iat[i,9] += pd.Timedelta(11, 'hours')
+        data.iat[i,10] += pd.Timedelta(11, 'hours')
+        data.iat[i,11] += pd.Timedelta(11, 'hours')
+        count2 += 1
 
+count = 0
+
+for i in range(len(data)):
+    if(
+        data.iat[i,9].hour >= 22 or 
+        data.iat[i,9].hour < 8 or
+        data.iat[i,10].hour >= 22 or 
+        data.iat[i,10].hour < 8 or
+        data.iat[i,11].hour >= 22 or 
+        data.iat[i,11].hour < 8
+    ):
+        print(i)
+        print(data.iat[i,9])
+        print(data.iat[i,10])
+        print(data.iat[i,11])
+        print()
         count += 1
-        if(count >=10):
-            break
 
-
+print(f'count of wrong entries = {count}')
+print(f'count of total wrong entries = {count2}')
 pd.options.display.max_columns = None
 pd.options.display.max_rows = None
 # pprint(data[['order_pick', 'order_place', 'order_delivered']])
@@ -104,12 +114,17 @@ for i in range(len(data)):
         )
     )
 
+    # green_date_set.add(data['order_place'].iloc[i].replace(
+    #         hour=6, minute=0, second=0))
+    # green_date_set.add(data['order_place'].iloc[i].replace(
+    #         hour=12, minute=0, second=0))
+    # green_date_set.add(data['order_place'].iloc[i].replace(
+    #         hour=18, minute=0, second=0))
+
     green_date_set.add(data['order_place'].iloc[i].replace(
-            hour=6, minute=0, second=0))
+            hour=8, minute=0, second=0))
     green_date_set.add(data['order_place'].iloc[i].replace(
-            hour=12, minute=0, second=0))
-    green_date_set.add(data['order_place'].iloc[i].replace(
-            hour=18, minute=0, second=0))
+            hour=22, minute=0, second=0))
 
 fig2 = plt.figure('Mumbai orders Histogram shifted to 8am-10pm slot')
 plt.xlabel("Date (divided in 6hr slots)")
