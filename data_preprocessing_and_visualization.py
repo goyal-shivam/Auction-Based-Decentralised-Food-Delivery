@@ -98,5 +98,9 @@ for i in range(len(data)):
 pprint(dict(c))
 print(len(dict(c)))
 
+data.sort_values('order_place', inplace=True)
+
+data.to_pickle('mumbai_7_days_data.pkl')
+
 
 plt.show()
