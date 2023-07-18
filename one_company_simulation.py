@@ -11,10 +11,10 @@ from math import ceil
 import numpy as np
 import pickle as pkl
 
-NUM_BOYS = 15  # 20 maybe
-NUM_BOYS_PER_COMPANY = 3 # 4 maybe
+NUM_BOYS_PER_COMPANY = 1 # 4 maybe
 NUM_OF_COMPANIES = 5
-BIKE_SPEED = 20 # 25 maybe
+NUM_BOYS = NUM_BOYS_PER_COMPANY * NUM_OF_COMPANIES # 20 maybe
+BIKE_SPEED = 1 # 25 maybe
 
 NUM_CUSTOMERS = 0
 
@@ -201,3 +201,33 @@ boys = simpy.Resource(env, NUM_BOYS)
 env.process(customer_generator(env, boys))
 
 env.run()
+
+
+
+x = []
+y = []
+
+for i in LOG_DATA:
+    # print(i)
+    x.append(i[0])
+    y.append(i[1])
+
+x = np.array(x)
+y = np.array(y)
+
+with open(f"NUM_BOYS_{NUM_BOYS}_BIKE_SPEED_{BIKE_SPEED}_decent.pkl", 'wb') as file:
+    pkl.dump((x,y), file)
+
+with open(f"NUM_BOYS_{NUM_BOYS}_BIKE_SPEED_{BIKE_SPEED}_ORDER_DATA.pkl", 'wb') as file:
+    pkl.dump(ORDER_DATA, file)
+
+
+
+
+plt.plot(x,y)
+
+plt.title(f"NUM_BOYS = {NUM_BOYS}, NUM_BOYS_PER_COMPANY = {NUM_BOYS_PER_COMPANY}, BIKE_SPEED = {BIKE_SPEED}, NUM_OF_COMPANIES = {NUM_OF_COMPANIES}")
+plt.xlabel("Time into Simulation")
+plt.ylabel("Waiting Queue Length")
+
+plt.show()
