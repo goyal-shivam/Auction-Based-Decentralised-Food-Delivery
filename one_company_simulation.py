@@ -11,17 +11,16 @@ from math import ceil
 import numpy as np
 import pickle as pkl
 
-NUM_BOYS_PER_COMPANY = 1 # 4 maybe
+NUM_BOYS_PER_COMPANY = 3 # 4 maybe
 NUM_OF_COMPANIES = 5
 NUM_BOYS = NUM_BOYS_PER_COMPANY * NUM_OF_COMPANIES # 20 maybe
-BIKE_SPEED = 1 # 25 maybe
+BIKE_SPEED = 5 # 25 maybe
 
-NUM_CUSTOMERS = 0
 
 BOYS = []
 LOG_DATA = []
 ORDER_DATA = [] # distance, time
-QUEUE_LENGTH = 0
+NUM_CUSTOMERS = 0
 
 MAX_LAT, MIN_LAT, MAX_LONG, MIN_LONG = 0,0,0,0
 
@@ -54,9 +53,9 @@ def get_index_of_nearest_boy(lat,long,time_now):
 
 def save_data(curr_time):
     if(len(LOG_DATA)==0):
-        LOG_DATA.append((curr_time, QUEUE_LENGTH))
+        LOG_DATA.append((curr_time, NUM_CUSTOMERS))
     elif (LOG_DATA[-1][0] == curr_time):
-        LOG_DATA[-1] = (LOG_DATA[-1][0], QUEUE_LENGTH)
+        LOG_DATA[-1] = (LOG_DATA[-1][0], NUM_CUSTOMERS)
     else:
         time = LOG_DATA[-1][0]
         val = LOG_DATA[-1][1]
@@ -64,7 +63,7 @@ def save_data(curr_time):
             time += 1
             LOG_DATA.append((time, val))
             # print('.', end='')
-        LOG_DATA.append((curr_time, QUEUE_LENGTH))
+        LOG_DATA.append((curr_time, NUM_CUSTOMERS))
         # print()
 
 data = pd.read_pickle('data/mumbai_7_days_data.pkl')
@@ -215,19 +214,20 @@ for i in LOG_DATA:
 x = np.array(x)
 y = np.array(y)
 
-with open(f"NUM_BOYS_{NUM_BOYS}_BIKE_SPEED_{BIKE_SPEED}_decent.pkl", 'wb') as file:
+with open(f"NUM_BOYS_{NUM_BOYS}_BIKE_SPEED_{BIKE_SPEED}_NUM_BOYS_PER_COMPANY_{NUM_BOYS_PER_COMPANY}_NUM_OF_COMPANIES_{NUM_OF_COMPANIES}_decent.pkl", 'wb') as file:
     pkl.dump((x,y), file)
 
-with open(f"NUM_BOYS_{NUM_BOYS}_BIKE_SPEED_{BIKE_SPEED}_ORDER_DATA.pkl", 'wb') as file:
+with open(f"NUM_BOYS_{NUM_BOYS}_BIKE_SPEED_{BIKE_SPEED}__NUM_BOYS_PER_COMPANY_{NUM_BOYS_PER_COMPANY}_NUM_OF_COMPANIES_{NUM_OF_COMPANIES}_ORDER_DATA.pkl", 'wb') as file:
     pkl.dump(ORDER_DATA, file)
 
 
 
 
-plt.plot(x,y)
-
+plt.figure('Queue Length vs Time')
 plt.title(f"NUM_BOYS = {NUM_BOYS}, NUM_BOYS_PER_COMPANY = {NUM_BOYS_PER_COMPANY}, BIKE_SPEED = {BIKE_SPEED}, NUM_OF_COMPANIES = {NUM_OF_COMPANIES}")
-plt.xlabel("Time into Simulation")
-plt.ylabel("Waiting Queue Length")
+plt.plot(x,y, color='#fc5c65')
+
+plt.axhline(np.average(y),0, np.amax(x), color='#20bf6b')
+print(f'\nDecentralised average queue length is {np.average(y)}\n')
 
 plt.show()
