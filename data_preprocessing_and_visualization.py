@@ -83,7 +83,7 @@ for k in purple_date_set:
     plt.axvline(x=k, color='#8e44ad', linewidth=1)
 
 
-with open('mumbai_orders_histogram_shifted.pkl', 'wb') as file:
+with open('data/mumbai_orders_histogram_shifted.pkl', 'wb') as file:
     pickle.dump(fig2,file)
 
 
@@ -100,7 +100,7 @@ print(len(dict(c)))
 
 data.sort_values('order_place', inplace=True)
 
-data.to_pickle('mumbai_7_days_data.pkl')
+data.to_pickle('data/mumbai_7_days_data.pkl')
 
 
 plt.show()
