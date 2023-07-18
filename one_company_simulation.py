@@ -16,6 +16,8 @@ NUM_BOYS_PER_COMPANY = 3 # 4 maybe
 NUM_OF_COMPANIES = 5
 BIKE_SPEED = 20 # 25 maybe
 
+NUM_CUSTOMERS = 0
+
 BOYS = []
 LOG_DATA = []
 ORDER_DATA = [] # distance, time
@@ -34,17 +36,21 @@ def man_dist(lat1, long1, lat2, long2):
 def get_index_of_nearest_boy(lat,long,time_now):
     min_time = 1000000000
     min_ind = -1
+    dist_corresponding_to_min = 1000000000
 
     for i in range(NUM_BOYS):
         new_time = BOYS[i]['free_at']
         if(BOYS[i]['free_at'] <= time_now):
             new_time = time_now
-        new_time += ceil(man_dist(lat, long, BOYS[i]['lat'], BOYS[i]['long'])/BIKE_SPEED)
+        dist = man_dist(lat, long, BOYS[i]['lat'], BOYS[i]['long'])
+
+        new_time += ceil(dist/BIKE_SPEED)
         if(min_time > new_time):
             min_ind = i
             min_time = new_time
+            dist_corresponding_to_min = dist
 
-    return min_ind
+    return min_ind, min_time, dist_corresponding_to_min
 
 def save_data(curr_time):
     if(len(LOG_DATA)==0):
@@ -123,6 +129,48 @@ max_dist = 66.00012665542367
  datetime.date(2022, 4, 7): 329}
 
 '''
+
+class Customer:
+    def __init__(self, env, boys, name, res_lat, res_long, client_lat, client_long):
+        self.env = env
+        self.boys = boys
+        self.name = name
+        self.res_lat = res_lat
+        self.res_long = res_long
+        self.client_lat = client_lat
+        self.client_long = client_long
+
+        self.bike_ind = None
+        self.bike_reach_restaurant_at = None
+        self.start_time = 0
+
+    def action(self):
+        global NUM_CUSTOMERS, ORDER_DATA
+
+        NUM_CUSTOMERS += 1
+        save_data(self.env.now)
+
+        self.start_time = self.env.now
+
+        self.bike_ind, self.bike_reach_restaurant_at, dist1 = get_index_of_nearest_boy(self.res_lat, self.res_long, env.now)
+
+        yield env.timeout(self.bike_reach_restaurant_at - self.env.now)
+
+        dist2 = man_dist(self.client_lat, self.client_long, self.res_lat, self.res_long)
+
+        time2 = ceil(dist2/BIKE_SPEED)
+
+        # update boy's coordinates
+        BOYS[self.bike_ind]['lat'] = self.client_lat
+        BOYS[self.bike_ind]['long'] = self.client_long
+        BOYS[self.bike_ind]['free_at'] = self.bike_reach_restaurant_at + time2
+
+        yield self.env.timeout(time2)
+
+        NUM_CUSTOMERS -= 1
+        save_data(self.env.now)
+        ORDER_DATA.append((dist1+dist2, self.env.now-self.start_time))
+
 
 def customer_generator(env, boys):
     global data, N
