@@ -36,3 +36,6 @@ add order price to the dataset based on the sensitivity of the order, breakfast,
 SIMULATING CUSTOMER RATING
 dependent on '''wait time'''
 FAALTU - freshness - temperature of food, politeness of rider behaviour
+
+put probabilistic random choice wherever possible
+    uday said something about two variable probability choice function
