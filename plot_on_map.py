@@ -1,7 +1,7 @@
 import pandas as pd
 import folium
 
-data = pd.read_pickle('data/data_preprocessed.pkl')
+data = pd.read_pickle('data/data_27_cols.pkl')
 MAX_LAT = max(data['Restaurant_latitude'].max(), data['Delivery_location_latitude'].max())
 MIN_LAT = min(data['Restaurant_latitude'].min(), data['Delivery_location_latitude'].min())
 MAX_LONG = max(data['Restaurant_longitude'].max(), data['Delivery_location_longitude'].max())

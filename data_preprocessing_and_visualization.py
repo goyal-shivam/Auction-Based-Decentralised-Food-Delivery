@@ -9,7 +9,7 @@ from matplotlib import pyplot as plt
 import pickle
 from collections import Counter
 
-data = pd.read_pickle('data/data_preprocessed.pkl')
+data = pd.read_pickle('data/data_27_cols.pkl')
 
 MIN_LAT, MAX_LAT, MIN_LONG, MAX_LONG = 16, 20, 71, 73
 # for mumbai
