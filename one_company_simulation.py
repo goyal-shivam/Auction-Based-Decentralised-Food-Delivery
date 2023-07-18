@@ -74,9 +74,9 @@ MAX_LAT = max(data[a].max(), data[b].max())
 MIN_LAT = min(data[a].min(), data[b].min())
 MAX_LONG = max(data[c].max(), data[d].max())
 MIN_LONG = min(data[c].min(), data[d].min())
-
-
 N = len(data)
+
+
 
 
 for i in range(NUM_BOYS):
@@ -123,6 +123,30 @@ max_dist = 66.00012665542367
  datetime.date(2022, 4, 7): 329}
 
 '''
+
+def customer_generator(env, boys):
+    global data, N
+    
+    for i in range(N):
+        if(i == 0):
+            t = 0
+        else:
+            t = (data.iat[i,10]-data.iat[i-1,10]).total_seconds()/60
+
+        yield env.timeout(ceil(t))
+
+        c = Customer(
+            env=env,
+            boys=boys,
+            name=f'Customer {i+1}',
+            res_lat=data.iat[i,1],
+            res_long=data.iat[i,2],
+            client_lat=data.iat[i,3],
+            client_long=data.iat[i,4]
+        )
+
+        env.process(c.action())
+
 
 env = simpy.Environment()
 boys = simpy.Resource(env, NUM_BOYS)

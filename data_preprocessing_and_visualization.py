@@ -1,3 +1,8 @@
+'''
+NOTES - 
+    Just use the order_place column of this dataset, other columns are not to be used. Only order_place column has been corrected from the original dataset
+'''
+
 import pandas as pd
 from pprint import pprint
 from matplotlib import pyplot as plt
