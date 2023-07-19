@@ -1,4 +1,4 @@
-# Decentralised simulation
+# Centralised simulation
 import pandas as pd
 from pprint import pprint
 from matplotlib import pyplot as plt
@@ -32,12 +32,13 @@ def dist(lat1, long1, lat2, long2):
 def man_dist(lat1, long1, lat2, long2):
     return dist(lat1, long1, lat2, long1) + dist(lat2, long1, lat2, long2)
 
-def get_index_of_nearest_boy(lat,long,time_now):
+def get_index_of_nearest_boy(lat,long,company,time_now):
+    global NUM_BOYS_PER_COMPANY
     min_time = 1000000000
     min_ind = -1
     dist_corresponding_to_min = 1000000000
 
-    for i in range(NUM_BOYS):
+    for i in range(company*NUM_BOYS_PER_COMPANY, (company+1)*NUM_BOYS_PER_COMPANY):
         new_time = BOYS[i]['free_at']
         if(BOYS[i]['free_at'] <= time_now):
             new_time = time_now
@@ -66,6 +67,7 @@ def save_data(curr_time):
         LOG_DATA.append((curr_time, NUM_CUSTOMERS))
         # print()
 
+
 data = pd.read_pickle('data/mumbai_7_days_data.pkl')
 pd.options.display.max_rows = None
 pd.options.display.max_columns = 4
@@ -81,6 +83,16 @@ MAX_LONG = max(data[c].max(), data[d].max())
 MIN_LONG = min(data[c].min(), data[d].min())
 N = len(data)
 
+def get_company_allot():
+    global N, NUM_OF_COMPANIES
+
+    company_allot = list(range(0, N))
+    company_allot = list(map(lambda x:x%NUM_OF_COMPANIES, company_allot))
+
+    company_allot = np.array(company_allot)
+    np.random.shuffle(company_allot)
+
+    return company_allot
 
 
 
@@ -130,7 +142,7 @@ max_dist = 66.00012665542367
 '''
 
 class Customer:
-    def __init__(self, env, boys, name, res_lat, res_long, client_lat, client_long):
+    def __init__(self, env, boys, name, res_lat, res_long, client_lat, client_long, company):
         self.env = env
         self.boys = boys
         self.name = name
@@ -141,6 +153,7 @@ class Customer:
 
         self.bike_ind = None
         self.bike_reach_restaurant_at = None
+        self.company = company
         self.start_time = 0
 
     def action(self):
@@ -151,7 +164,7 @@ class Customer:
 
         self.start_time = self.env.now
 
-        self.bike_ind, self.bike_reach_restaurant_at, dist1 = get_index_of_nearest_boy(self.res_lat, self.res_long, env.now)
+        self.bike_ind, self.bike_reach_restaurant_at, dist1 = get_index_of_nearest_boy(self.res_lat, self.res_long, self.company, env.now)
 
         yield env.timeout(self.bike_reach_restaurant_at - self.env.now)
 
@@ -173,6 +186,8 @@ class Customer:
 
 def customer_generator(env, boys):
     global data, N
+
+    company_allot = get_company_allot()
     
     for i in range(N):
         if(i == 0):
@@ -189,7 +204,8 @@ def customer_generator(env, boys):
             res_lat=data.iat[i,1],
             res_long=data.iat[i,2],
             client_lat=data.iat[i,3],
-            client_long=data.iat[i,4]
+            client_long=data.iat[i,4],
+            company=company_allot[i]
         )
 
         env.process(c.action())
@@ -214,10 +230,10 @@ for i in LOG_DATA:
 x = np.array(x)
 y = np.array(y)
 
-with open(f"data/NUM_BOYS_{NUM_BOYS}_BIKE_SPEED_{BIKE_SPEED}_NUM_BOYS_PER_COMPANY_{NUM_BOYS_PER_COMPANY}_NUM_OF_COMPANIES_{NUM_OF_COMPANIES}_decent.pkl", 'wb') as file:
+with open(f"data/NUM_BOYS_{NUM_BOYS}_BIKE_SPEED_{BIKE_SPEED}_NUM_BOYS_PER_COMPANY_{NUM_BOYS_PER_COMPANY}_NUM_OF_COMPANIES_{NUM_OF_COMPANIES}_centralised.pkl", 'wb') as file:
     pkl.dump((x,y), file)
 
-with open(f"data/NUM_BOYS_{NUM_BOYS}_BIKE_SPEED_{BIKE_SPEED}__NUM_BOYS_PER_COMPANY_{NUM_BOYS_PER_COMPANY}_NUM_OF_COMPANIES_{NUM_OF_COMPANIES}_ORDER_DATA.pkl", 'wb') as file:
+with open(f"data/NUM_BOYS_{NUM_BOYS}_BIKE_SPEED_{BIKE_SPEED}__NUM_BOYS_PER_COMPANY_{NUM_BOYS_PER_COMPANY}_NUM_OF_COMPANIES_{NUM_OF_COMPANIES}_ORDER_DATA_centralised.pkl", 'wb') as file:
     pkl.dump(ORDER_DATA, file)
 
 
@@ -225,9 +241,9 @@ with open(f"data/NUM_BOYS_{NUM_BOYS}_BIKE_SPEED_{BIKE_SPEED}__NUM_BOYS_PER_COMPA
 
 plt.figure('Queue Length vs Time')
 plt.title(f"NUM_BOYS = {NUM_BOYS}, NUM_BOYS_PER_COMPANY = {NUM_BOYS_PER_COMPANY}, BIKE_SPEED = {BIKE_SPEED}, NUM_OF_COMPANIES = {NUM_OF_COMPANIES}")
-plt.plot(x,y, color='#fc5c65')
+plt.plot(x,y, color='#a55eea')
 
-plt.axhline(np.average(y),0, np.amax(x), color='#576574')
+plt.axhline(np.average(y),0, np.amax(x), color='#222f3e')
 print(f'\nDecentralised average queue length is {np.average(y)}\n')
 
 plt.show()
