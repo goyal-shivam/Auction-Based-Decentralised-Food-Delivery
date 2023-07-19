@@ -11,7 +11,7 @@ from math import ceil
 import numpy as np
 import pickle as pkl
 
-NUM_BOYS_PER_COMPANY = 3 # 4 maybe
+NUM_BOYS_PER_COMPANY = 2 # 4 maybe
 NUM_OF_COMPANIES = 5
 NUM_BOYS = NUM_BOYS_PER_COMPANY * NUM_OF_COMPANIES # 20 maybe
 BIKE_SPEED = 1 # 25 maybe

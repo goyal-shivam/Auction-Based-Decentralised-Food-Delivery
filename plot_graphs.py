@@ -7,6 +7,7 @@ import pandas as pd
 draw_queue = 1
 draw_sums = 1
 draw_hists = 1
+res, res2 = None, None
 
 '''
 two queue length colours
@@ -16,22 +17,14 @@ two average line colours
 # 20bf6b and #fa8231 not so good
 '''
 queue_length_colour = ('#fc5c65', '#a55eea')
-average_line_colours = ('#576574', '#222f3e')
+average_line_colours = ('#10ac84', '#222f3e')
 
 NUM_BOYS_PER_COMPANY = 3 # 4 maybe
-for NUM_BOYS_PER_COMPANY in [1]:
-    print(f'############\nNUM_BOYS_PER_COMPANY = {NUM_BOYS_PER_COMPANY}\n#############\n')
+for NUM_BOYS_PER_COMPANY in [3]:
     NUM_OF_COMPANIES = 5
     NUM_BOYS = NUM_BOYS_PER_COMPANY * NUM_OF_COMPANIES # 20 maybe
     BIKE_SPEED = 1 # 25 maybe
-
-
-    # with open('data/mumbai_orders_histogram.pkl', 'rb') as file:
-    #     fig2 = pickle.load(file)
-
-    # with open('data/mumbai_orders_histogram_shifted.pkl', 'rb') as file:
-    #     fig = pkl.load(file)
-
+    print(f"NUM_BOYS = {NUM_BOYS}\nBIKE_SPEED = {BIKE_SPEED}\nNUM_BOYS_PER_COMPANY = {NUM_BOYS_PER_COMPANY}\nNUM_OF_COMPANIES = {NUM_OF_COMPANIES}\n\n")
 
 
     # PLOT QUEUE LENGTH GRAPH
@@ -39,27 +32,23 @@ for NUM_BOYS_PER_COMPANY in [1]:
         with open(f"data/NUM_BOYS_{NUM_BOYS}_BIKE_SPEED_{BIKE_SPEED}_NUM_BOYS_PER_COMPANY_{NUM_BOYS_PER_COMPANY}_NUM_OF_COMPANIES_{NUM_OF_COMPANIES}_decent.pkl", 'rb') as file:
             (x,y) = pkl.load(file)
 
-        fig = plt.figure(f'Queue Length vs Time_{NUM_BOYS_PER_COMPANY}')
+        fig = plt.figure(f'Queue Length vs Time')
         plt.title(f"NUM_BOYS = {NUM_BOYS}, NUM_BOYS_PER_COMPANY = {NUM_BOYS_PER_COMPANY}, BIKE_SPEED = {BIKE_SPEED}, NUM_OF_COMPANIES = {NUM_OF_COMPANIES}")
         plt.plot(x,y, color=queue_length_colour[0])
 
         res = np.average(y)
         plt.axhline(np.average(y),0, np.amax(x), color=average_line_colours[0])
-        print(f'\nDecentralised average queue length is {res}\n')
 
         # SPACE FOR CENTRALISED VERSION
         with open(f"data/NUM_BOYS_{NUM_BOYS}_BIKE_SPEED_{BIKE_SPEED}_NUM_BOYS_PER_COMPANY_{NUM_BOYS_PER_COMPANY}_NUM_OF_COMPANIES_{NUM_OF_COMPANIES}_centralised.pkl", 'rb') as file:
             (x,y) = pkl.load(file)
 
-        fig = plt.figure(f'Queue Length vs Time_{NUM_BOYS_PER_COMPANY}')
+        fig = plt.figure(f'Queue Length vs Time')
         plt.title(f"NUM_BOYS = {NUM_BOYS}, NUM_BOYS_PER_COMPANY = {NUM_BOYS_PER_COMPANY}, BIKE_SPEED = {BIKE_SPEED}, NUM_OF_COMPANIES = {NUM_OF_COMPANIES}")
         plt.plot(x,y, color=queue_length_colour[1])
 
         plt.axhline(np.average(y),0, np.amax(x), color=average_line_colours[1])
         res2 = np.average(y)
-        print(f'\nCentralised average queue length is {res2}\n')
-
-        print(f'Percentage improvement = {(res/res2)*100}')
 
         plt.legend(["Decentralised", "Average Decentralised", "Centralised", "Average Centralised"])
 
@@ -122,7 +111,7 @@ for NUM_BOYS_PER_COMPANY in [1]:
 
         # SPACE FOR CENTRALISED VERSION
 
-        plt.figure('Distance Travelled vs Time')
+        fig = plt.figure('Distance Travelled vs Time')
         plt.title(f"NUM_BOYS = {NUM_BOYS}, NUM_BOYS_PER_COMPANY = {NUM_BOYS_PER_COMPANY}, BIKE_SPEED = {BIKE_SPEED}, NUM_OF_COMPANIES = {NUM_OF_COMPANIES}")
         plt.plot(sum_dist2)
         plt.xlabel("Number of Orders")
@@ -133,7 +122,7 @@ for NUM_BOYS_PER_COMPANY in [1]:
             pkl.dump(fig,file)
 
 
-        plt.figure('Total wait time vs Time')
+        fig = plt.figure('Total wait time vs Time')
         plt.title(f"NUM_BOYS = {NUM_BOYS}, NUM_BOYS_PER_COMPANY = {NUM_BOYS_PER_COMPANY}, BIKE_SPEED = {BIKE_SPEED}, NUM_OF_COMPANIES = {NUM_OF_COMPANIES}")
         plt.xlabel("Number of Orders")
         plt.ylabel("Total Wait time of all customers involved (mins)")
@@ -156,7 +145,7 @@ for NUM_BOYS_PER_COMPANY in [1]:
         # bins2 = np.linspace(0, max(wait.max(), wait2.max()), 20)
 
         plt.style.use('seaborn-deep')
-        plt.figure('Distance Histogram')
+        fig = plt.figure('Distance Histogram')
         plt.title(f"NUM_BOYS = {NUM_BOYS}, NUM_BOYS_PER_COMPANY = {NUM_BOYS_PER_COMPANY}, BIKE_SPEED = {BIKE_SPEED}, NUM_OF_COMPANIES = {NUM_OF_COMPANIES}")
         plt.hist([dist, dist2], bins, label=['Decentralised', 'Centralised'])
         plt.xlabel("Distance (km)")
@@ -166,7 +155,7 @@ for NUM_BOYS_PER_COMPANY in [1]:
         with open(f"data/graph_dist_hist_NUM_BOYS_{NUM_BOYS}_BIKE_SPEED_{BIKE_SPEED}__NUM_BOYS_PER_COMPANY_{NUM_BOYS_PER_COMPANY}_NUM_OF_COMPANIES_{NUM_OF_COMPANIES}.pkl", 'wb') as file:
             pkl.dump(fig,file)
 
-        plt.figure('Wait Time Histogram')
+        fig = plt.figure('Wait Time Histogram')
         plt.title(f"NUM_BOYS = {NUM_BOYS}, NUM_BOYS_PER_COMPANY = {NUM_BOYS_PER_COMPANY}, BIKE_SPEED = {BIKE_SPEED}, NUM_OF_COMPANIES = {NUM_OF_COMPANIES}")
         plt.hist([wait, wait2], bins2, label=['Decentralised', 'Centralised'])
         plt.xlabel("Wait Time (mins)")
@@ -178,28 +167,10 @@ for NUM_BOYS_PER_COMPANY in [1]:
 
 
 
-    # ''' # PRINTING INFORMATION
-    # print(f'\nTotal Wait Times\nDecentralised - {sum_wait[-1]} mins and Centralised - {sum_wait2[-1]} mins\n')
-    # print(f'Percentage improvement = {(sum_wait[-1]/sum_wait2[-1])*100}')
-    # print(f'Total Distance Travelled\nDecentralised - {sum_dist[-1]} kms and Centralised - {sum_dist2[-1]} kms\n')
-    # print(f'Percentage improvement = {(sum_dist[-1]/sum_dist2[-1])*100}')
-
-    # print(f'\nAverage Wait Times\nDecentralised - {sum_wait[-1]/len(sum_wait)} mins and Centralised - {sum_wait2[-1]/len(sum_wait2)} mins\n')
-    # print(f'Percentage improvement = {((sum_wait[-1]/len(sum_wait))/(sum_wait2[-1]/len(sum_wait2)))*100}')
-    # print(f'Average Distance Travelled\nDecentralised - {sum_dist[-1]/len(sum_dist)} kms and Centralised - {sum_dist2[-1]/len(sum_dist2)} kms\n')
-    # print(f'Percentage improvement = {((sum_dist[-1]/len(sum_dist))/(sum_dist2[-1]/len(sum_dist2)))*100}')
-    # '''
-
-    # print(f'\nTotal Wait Times\nDecentralised - {sum_wait[-1]} mins\n')
-    # print(f'Total Distance Travelled\nDecentralised - {sum_dist[-1]} kms\n')
-
-    # print(f'\nAverage Wait Times\nDecentralised - {sum_wait[-1]/len(sum_wait)} mins\n')
-    # print(f'Average Distance Travelled\nDecentralised - {sum_dist[-1]/len(sum_dist)} kms\n')
-
 # mean, min, max, median, sum
     arrays = [
-        np.array(["Distance", "Distance", "Distance", "Distance", "Distance", "Wait Time", "Wait Time", "Wait Time", "Wait Time", "Wait Time"]),
-        np.array(["Min", "Median", "Max", "Sum", "Average", "Min", "Median", "Max", "Sum", "Average"])
+        np.array(["Distance", "Distance", "Distance", "Distance", "Distance", "Wait Time", "Wait Time", "Wait Time", "Wait Time", "Wait Time", 'Average']),
+        np.array(["Min", "Median", "Max", "Sum", "Average", "Min", "Median", "Max", "Sum", "Average", 'Queue Length'])
     ]
 
     results = [
@@ -213,18 +184,13 @@ for NUM_BOYS_PER_COMPANY in [1]:
         [np.max(wait),np.max(wait2)],
         [np.sum(wait),np.sum(wait2)],
         [np.average(wait),np.average(wait2)],
+        [res,res2]
     ]
 
     results = pd.DataFrame(results, index=arrays)
     results.columns = ['Decentralised', 'Centralised']
     results['Improvement'] = (results['Decentralised']/results['Centralised'])*100
     print(results)
-
-    # print(f'Decentralised\nMax Wait Time = {wait.max()}\nMin Wait Time = {wait.min()}\nMax Distance = {dist.max()}\nMin Distance = {dist.min()}\n\n')
-    # print(f'Centralised\nMax Wait Time = {wait2.max()}\nMin Wait Time = {wait2.min()}\nMax Distance = {dist2.max()}\nMin Distance = {dist2.min()}\n')
-
-    # print(f'Decentralised\nMedian Wait Time = {np.median(wait)}\nMedian Distance = {np.median(dist)}\n\n')
-    # print(f'Centralised\nMedian Wait Time = {np.median(wait2)}\nMedian Distance = {np.median(dist2)}\n')
 
 
 
