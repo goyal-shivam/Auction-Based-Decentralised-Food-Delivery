@@ -14,7 +14,7 @@ import pickle as pkl
 NUM_BOYS_PER_COMPANY = 2 # 4 maybe
 NUM_OF_COMPANIES = 5
 NUM_BOYS = NUM_BOYS_PER_COMPANY * NUM_OF_COMPANIES # 20 maybe
-BIKE_SPEED = 1 # 25 maybe
+BIKE_SPEED = 25
 
 
 BOYS = []
@@ -43,7 +43,7 @@ def get_index_of_nearest_boy(lat,long,time_now):
             new_time = time_now
         dist = man_dist(lat, long, BOYS[i]['lat'], BOYS[i]['long'])
 
-        new_time += ceil(dist/BIKE_SPEED)
+        new_time += ceil((dist/BIKE_SPEED)*60)
         if(min_time > new_time):
             min_ind = i
             min_time = new_time
@@ -157,7 +157,7 @@ class Customer:
 
         dist2 = man_dist(self.client_lat, self.client_long, self.res_lat, self.res_long)
 
-        time2 = ceil(dist2/BIKE_SPEED)
+        time2 = ceil((dist2/BIKE_SPEED)*60)
 
         # update boy's coordinates
         BOYS[self.bike_ind]['lat'] = self.client_lat
