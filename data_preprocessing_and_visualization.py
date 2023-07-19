@@ -35,10 +35,10 @@ for i in range(len(data)):
     ):
         data.iat[i,10] += pd.Timedelta(11, 'hours')
 
-# shifting all order dates to 1 to 7th April
+# shifting all order dates to 1st April
 for i in range(len(data)):
     data.iat[i,10] = data.iat[i,10].replace(
-        day=(data.iat[i,10].day % 7)+1,
+        day=1,
         month=4
     )
 
@@ -88,7 +88,7 @@ for k in purple_date_set:
     plt.axvline(x=k, color='#8e44ad', linewidth=1)
 
 
-with open('data/mumbai_orders_histogram_shifted.pkl', 'wb') as file:
+with open('data/mumbai_orders_histogram_shifted_to_one_day.pkl', 'wb') as file:
     pickle.dump(fig2,file)
 
 
@@ -105,7 +105,7 @@ print(len(dict(c)))
 
 data.sort_values('order_place', inplace=True)
 
-data.to_pickle('data/mumbai_7_days_data.pkl')
+data.to_pickle('data/mumbai_data_all_orders_shifted_to_one_day.pkl')
 
 
 plt.show()

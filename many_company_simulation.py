@@ -11,10 +11,10 @@ from math import ceil
 import numpy as np
 import pickle as pkl
 
-NUM_BOYS_PER_COMPANY = 2 # 4 maybe
+NUM_BOYS_PER_COMPANY = 1 # 4 maybe
 NUM_OF_COMPANIES = 5
 NUM_BOYS = NUM_BOYS_PER_COMPANY * NUM_OF_COMPANIES # 20 maybe
-BIKE_SPEED = 1 # 25 maybe
+BIKE_SPEED = 20 # 25 maybe
 
 
 BOYS = []
@@ -68,7 +68,7 @@ def save_data(curr_time):
         # print()
 
 
-data = pd.read_pickle('data/mumbai_7_days_data.pkl')
+data = pd.read_pickle('data/mumbai_data_all_orders_shifted_to_one_day.pkl')
 pd.options.display.max_rows = None
 pd.options.display.max_columns = 4
 
@@ -239,7 +239,7 @@ with open(f"data/NUM_BOYS_{NUM_BOYS}_BIKE_SPEED_{BIKE_SPEED}__NUM_BOYS_PER_COMPA
 
 
 
-plt.figure('Queue Length vs Time')
+plt.figure('Queue Length vs Time Centralised, many companies')
 plt.title(f"NUM_BOYS = {NUM_BOYS}, NUM_BOYS_PER_COMPANY = {NUM_BOYS_PER_COMPANY}, BIKE_SPEED = {BIKE_SPEED}, NUM_OF_COMPANIES = {NUM_OF_COMPANIES}")
 plt.plot(x,y, color='#a55eea')
 

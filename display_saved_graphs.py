@@ -5,10 +5,10 @@
 from matplotlib import pyplot as plt
 import pickle
 
-NUM_BOYS_PER_COMPANY = 3 # 4 maybe
+NUM_BOYS_PER_COMPANY = 1 # 4 maybe
 NUM_OF_COMPANIES = 5
 NUM_BOYS = NUM_BOYS_PER_COMPANY * NUM_OF_COMPANIES # 20 maybe
-BIKE_SPEED = 1 # 25 maybe
+BIKE_SPEED = 20 # 25 maybe
 
 
 with open(f"data/graph_queue_length_NUM_BOYS_{NUM_BOYS}_BIKE_SPEED_{BIKE_SPEED}__NUM_BOYS_PER_COMPANY_{NUM_BOYS_PER_COMPANY}_NUM_OF_COMPANIES_{NUM_OF_COMPANIES}.pkl", 'rb') as file:
