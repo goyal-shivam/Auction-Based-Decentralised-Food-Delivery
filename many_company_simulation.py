@@ -11,10 +11,10 @@ from math import ceil
 import numpy as np
 import pickle as pkl
 
-NUM_BOYS_PER_COMPANY = 3 # 4 maybe
+NUM_BOYS_PER_COMPANY = 1 # 4 maybe
 NUM_OF_COMPANIES = 5
 NUM_BOYS = NUM_BOYS_PER_COMPANY * NUM_OF_COMPANIES # 20 maybe
-BIKE_SPEED = 5 # 25 maybe
+BIKE_SPEED = 1 # 25 maybe
 
 
 BOYS = []
@@ -244,6 +244,6 @@ plt.title(f"NUM_BOYS = {NUM_BOYS}, NUM_BOYS_PER_COMPANY = {NUM_BOYS_PER_COMPANY}
 plt.plot(x,y, color='#a55eea')
 
 plt.axhline(np.average(y),0, np.amax(x), color='#222f3e')
-print(f'\nDecentralised average queue length is {np.average(y)}\n')
+print(f'\nCentralised average queue length is {np.average(y)}\n')
 
 plt.show()
