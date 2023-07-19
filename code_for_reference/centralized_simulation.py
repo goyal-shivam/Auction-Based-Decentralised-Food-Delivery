@@ -39,7 +39,7 @@ def get_index_of_nearest_boy(lat,long,company,time_now):
         if(BOYS[i]['busy'] == 0):
             new_time += time_now
 
-        new_time = ceil(man_dist(lat, long, BOYS[i]['lat'], BOYS[i]['long'])/BIKE_SPEED*60)
+        new_time += ceil(man_dist(lat, long, BOYS[i]['lat'], BOYS[i]['long'])/BIKE_SPEED*60)
         if(min_time > new_time):
             min_ind = i
             min_time = new_time
@@ -70,7 +70,7 @@ def customer_generator(env, companies):
         company_allot.append(count)
         
         if count == NUM_OF_COMPANIES-1:
-            count = 0
+            count = 0   
         else:
             count += 1
 
