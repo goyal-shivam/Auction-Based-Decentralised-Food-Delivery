@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pickle as pkl
 from math import ceil
+import pandas as pd
 
 draw_queue = 1
 draw_sums = 1
@@ -18,11 +19,11 @@ queue_length_colour = ('#fc5c65', '#a55eea')
 average_line_colours = ('#576574', '#222f3e')
 
 NUM_BOYS_PER_COMPANY = 3 # 4 maybe
-for NUM_BOYS_PER_COMPANY in [3]:
+for NUM_BOYS_PER_COMPANY in [1]:
     print(f'############\nNUM_BOYS_PER_COMPANY = {NUM_BOYS_PER_COMPANY}\n#############\n')
     NUM_OF_COMPANIES = 5
     NUM_BOYS = NUM_BOYS_PER_COMPANY * NUM_OF_COMPANIES # 20 maybe
-    BIKE_SPEED = 5 # 25 maybe
+    BIKE_SPEED = 1 # 25 maybe
 
 
     # with open('data/mumbai_orders_histogram.pkl', 'rb') as file:
@@ -60,7 +61,7 @@ for NUM_BOYS_PER_COMPANY in [3]:
 
         print(f'Percentage improvement = {(res/res2)*100}')
 
-
+        plt.legend(["Decentralised", "Average Decentralised", "Centralised", "Average Centralised"])
 
         # saving graph
         with open(f"data/graph_queue_length_NUM_BOYS_{NUM_BOYS}_BIKE_SPEED_{BIKE_SPEED}__NUM_BOYS_PER_COMPANY_{NUM_BOYS_PER_COMPANY}_NUM_OF_COMPANIES_{NUM_OF_COMPANIES}.pkl", 'wb') as file:
@@ -147,8 +148,12 @@ for NUM_BOYS_PER_COMPANY in [3]:
 
     # PLOT WAIT TIME AND DISTANCE HISTOGRAMS
     if (draw_hists>0):
-        bins = np.linspace(0, max(dist.max(),dist2.max()), 20)
-        bins2 = np.linspace(0, max(wait.max(), wait2.max()), 20)
+        bins = list(range(0,int(max(dist.max(),dist2.max())),5))
+        bins = np.array(bins)
+        bins2 = list(range(0,int(max(wait.max(),wait2.max())),5))
+        bins2 = np.array(bins2)
+        # bins = np.linspace(0, max(dist.max(),dist2.max()), 20)
+        # bins2 = np.linspace(0, max(wait.max(), wait2.max()), 20)
 
         plt.style.use('seaborn-deep')
         plt.figure('Distance Histogram')
@@ -174,15 +179,15 @@ for NUM_BOYS_PER_COMPANY in [3]:
 
 
     # ''' # PRINTING INFORMATION
-    print(f'\nTotal Wait Times\nDecentralised - {sum_wait[-1]} mins and Centralised - {sum_wait2[-1]} mins\n')
-    print(f'Percentage improvement = {(sum_wait[-1]/sum_wait2[-1])*100}')
-    print(f'Total Distance Travelled\nDecentralised - {sum_dist[-1]} kms and Centralised - {sum_dist2[-1]} kms\n')
-    print(f'Percentage improvement = {(sum_dist[-1]/sum_dist2[-1])*100}')
+    # print(f'\nTotal Wait Times\nDecentralised - {sum_wait[-1]} mins and Centralised - {sum_wait2[-1]} mins\n')
+    # print(f'Percentage improvement = {(sum_wait[-1]/sum_wait2[-1])*100}')
+    # print(f'Total Distance Travelled\nDecentralised - {sum_dist[-1]} kms and Centralised - {sum_dist2[-1]} kms\n')
+    # print(f'Percentage improvement = {(sum_dist[-1]/sum_dist2[-1])*100}')
 
-    print(f'\nAverage Wait Times\nDecentralised - {sum_wait[-1]/len(sum_wait)} mins and Centralised - {sum_wait2[-1]/len(sum_wait2)} mins\n')
-    print(f'Percentage improvement = {((sum_wait[-1]/len(sum_wait))/(sum_wait2[-1]/len(sum_wait2)))*100}')
-    print(f'Average Distance Travelled\nDecentralised - {sum_dist[-1]/len(sum_dist)} kms and Centralised - {sum_dist2[-1]/len(sum_dist2)} kms\n')
-    print(f'Percentage improvement = {((sum_dist[-1]/len(sum_dist))/(sum_dist2[-1]/len(sum_dist2)))*100}')
+    # print(f'\nAverage Wait Times\nDecentralised - {sum_wait[-1]/len(sum_wait)} mins and Centralised - {sum_wait2[-1]/len(sum_wait2)} mins\n')
+    # print(f'Percentage improvement = {((sum_wait[-1]/len(sum_wait))/(sum_wait2[-1]/len(sum_wait2)))*100}')
+    # print(f'Average Distance Travelled\nDecentralised - {sum_dist[-1]/len(sum_dist)} kms and Centralised - {sum_dist2[-1]/len(sum_dist2)} kms\n')
+    # print(f'Percentage improvement = {((sum_dist[-1]/len(sum_dist))/(sum_dist2[-1]/len(sum_dist2)))*100}')
     # '''
 
     # print(f'\nTotal Wait Times\nDecentralised - {sum_wait[-1]} mins\n')
@@ -191,8 +196,35 @@ for NUM_BOYS_PER_COMPANY in [3]:
     # print(f'\nAverage Wait Times\nDecentralised - {sum_wait[-1]/len(sum_wait)} mins\n')
     # print(f'Average Distance Travelled\nDecentralised - {sum_dist[-1]/len(sum_dist)} kms\n')
 
-    print(f'Decentralised\nMax Wait Time = {wait.max()}\nMin Wait Time = {wait.min()}\nMax Distance = {dist.max()}\nMin Distance = {dist.min()}\n\n')
-    print(f'Centralised\nMax Wait Time = {wait2.max()}\nMin Wait Time = {wait2.min()}\nMax Distance = {dist2.max()}\nMin Distance = {dist2.min()}\n')
+# mean, min, max, median, sum
+    arrays = [
+        np.array(["Distance", "Distance", "Distance", "Distance", "Distance", "Wait Time", "Wait Time", "Wait Time", "Wait Time", "Wait Time"]),
+        np.array(["Min", "Median", "Max", "Sum", "Average", "Min", "Median", "Max", "Sum", "Average"])
+    ]
+
+    results = [
+        [np.min(dist),np.min(dist2)],
+        [np.median(dist),np.median(dist2)],
+        [np.max(dist),np.max(dist2)],
+        [np.sum(dist),np.sum(dist2)],
+        [np.average(dist),np.average(dist2)],
+        [np.min(wait),np.min(wait2)],
+        [np.median(wait),np.median(wait2)],
+        [np.max(wait),np.max(wait2)],
+        [np.sum(wait),np.sum(wait2)],
+        [np.average(wait),np.average(wait2)],
+    ]
+
+    results = pd.DataFrame(results, index=arrays)
+    results.columns = ['Decentralised', 'Centralised']
+    results['Improvement'] = (results['Decentralised']/results['Centralised'])*100
+    print(results)
+
+    # print(f'Decentralised\nMax Wait Time = {wait.max()}\nMin Wait Time = {wait.min()}\nMax Distance = {dist.max()}\nMin Distance = {dist.min()}\n\n')
+    # print(f'Centralised\nMax Wait Time = {wait2.max()}\nMin Wait Time = {wait2.min()}\nMax Distance = {dist2.max()}\nMin Distance = {dist2.min()}\n')
+
+    # print(f'Decentralised\nMedian Wait Time = {np.median(wait)}\nMedian Distance = {np.median(dist)}\n\n')
+    # print(f'Centralised\nMedian Wait Time = {np.median(wait2)}\nMedian Distance = {np.median(dist2)}\n')
 
 
 
