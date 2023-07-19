@@ -19,11 +19,13 @@ two average line colours
 queue_length_colour = ('#fc5c65', '#a55eea')
 average_line_colours = ('#10ac84', '#222f3e')
 
-NUM_BOYS_PER_COMPANY = 3 # 4 maybe
-for NUM_BOYS_PER_COMPANY in [3]:
-    NUM_OF_COMPANIES = 5
+'''
+NUM_BOYS_PER_COMPANY = 2 # 4 maybe
+'''
+for NUM_BOYS_PER_COMPANY in [10]:
+    NUM_OF_COMPANIES = 20
     NUM_BOYS = NUM_BOYS_PER_COMPANY * NUM_OF_COMPANIES # 20 maybe
-    BIKE_SPEED = 25
+    BIKE_SPEED = 40
     print(f"NUM_BOYS = {NUM_BOYS}\nBIKE_SPEED = {BIKE_SPEED}\nNUM_BOYS_PER_COMPANY = {NUM_BOYS_PER_COMPANY}\nNUM_OF_COMPANIES = {NUM_OF_COMPANIES}\n\n")
 
 
