@@ -4,15 +4,16 @@ import pickle as pkl
 from math import ceil
 
 draw_queue = 1
-draw_sums = 0
-draw_hists = 0
+draw_sums = 1
+draw_hists = 1
 
 
-NUM_BOYS_PER_COMPANY = 1 # 4 maybe
-for NUM_BOYS_PER_COMPANY in [1,2,3]:
+NUM_BOYS_PER_COMPANY = 3 # 4 maybe
+for NUM_BOYS_PER_COMPANY in [3]:
+    print(f'############\nNUM_BOYS_PER_COMPANY = {NUM_BOYS_PER_COMPANY}\n#############\n')
     NUM_OF_COMPANIES = 5
     NUM_BOYS = NUM_BOYS_PER_COMPANY * NUM_OF_COMPANIES # 20 maybe
-    BIKE_SPEED = 1 # 25 maybe
+    BIKE_SPEED = 5 # 25 maybe
 
 
     # with open('data/mumbai_orders_histogram.pkl', 'rb') as file:
@@ -32,13 +33,13 @@ for NUM_BOYS_PER_COMPANY in [1,2,3]:
 
     # PLOT QUEUE LENGTH GRAPH
     if draw_queue > 0:
-        with open(f"NUM_BOYS_{NUM_BOYS}_BIKE_SPEED_{BIKE_SPEED}_decent.pkl", 'rb') as file:
+        with open(f"data/NUM_BOYS_{NUM_BOYS}_BIKE_SPEED_{BIKE_SPEED}_NUM_BOYS_PER_COMPANY_{NUM_BOYS_PER_COMPANY}_NUM_OF_COMPANIES_{NUM_OF_COMPANIES}_decent.pkl", 'rb') as file:
             (x,y) = pkl.load(file)
 
-        with open(f"NUM_BOYS_{NUM_BOYS}_BIKE_SPEED_{BIKE_SPEED}_ORDER_DATA.pkl", 'rb') as file:
+        with open(f"data/NUM_BOYS_{NUM_BOYS}_BIKE_SPEED_{BIKE_SPEED}__NUM_BOYS_PER_COMPANY_{NUM_BOYS_PER_COMPANY}_NUM_OF_COMPANIES_{NUM_OF_COMPANIES}_ORDER_DATA.pkl", 'rb') as file:
             ORDER_DATA = pkl.load(file)
 
-        plt.figure(f'Queue Length vs Time_{NUM_BOYS_PER_COMPANY}')
+        fig = plt.figure(f'Queue Length vs Time_{NUM_BOYS_PER_COMPANY}')
         plt.title(f"NUM_BOYS = {NUM_BOYS}, NUM_BOYS_PER_COMPANY = {NUM_BOYS_PER_COMPANY}, BIKE_SPEED = {BIKE_SPEED}, NUM_OF_COMPANIES = {NUM_OF_COMPANIES}")
         plt.plot(x,y, color='#fc5c65')
 
@@ -47,6 +48,9 @@ for NUM_BOYS_PER_COMPANY in [1,2,3]:
 
         # space for centralised version
 
+
+        with open(f"data/graph_queue_length_NUM_BOYS_{NUM_BOYS}_BIKE_SPEED_{BIKE_SPEED}__NUM_BOYS_PER_COMPANY_{NUM_BOYS_PER_COMPANY}_NUM_OF_COMPANIES_{NUM_OF_COMPANIES}.pkl", 'wb') as file:
+            pkl.dump(fig,file)
 
 
     # PLOT WAIT TIME AND DISTANCE SUM GRAPHS
@@ -87,6 +91,9 @@ for NUM_BOYS_PER_COMPANY in [1,2,3]:
         # plt.legend(["Decentralised", "Centralised"])
         plt.legend(["Decentralised"])
 
+        with open(f"data/graph_dist_sum_NUM_BOYS_{NUM_BOYS}_BIKE_SPEED_{BIKE_SPEED}__NUM_BOYS_PER_COMPANY_{NUM_BOYS_PER_COMPANY}_NUM_OF_COMPANIES_{NUM_OF_COMPANIES}.pkl", 'wb') as file:
+            pkl.dump(fig,file)
+
 
         plt.figure('Total wait time vs Time')
         plt.title(f"NUM_BOYS = {NUM_BOYS}, NUM_BOYS_PER_COMPANY = {NUM_BOYS_PER_COMPANY}, BIKE_SPEED = {BIKE_SPEED}, NUM_OF_COMPANIES = {NUM_OF_COMPANIES}")
@@ -95,6 +102,9 @@ for NUM_BOYS_PER_COMPANY in [1,2,3]:
         # plt.plot(sum_wait2)
         # plt.legend(["Decentralised", "Centralised"])
         plt.legend(["Decentralised"])
+
+        with open(f"data/graph_wait_time_sum_NUM_BOYS_{NUM_BOYS}_BIKE_SPEED_{BIKE_SPEED}__NUM_BOYS_PER_COMPANY_{NUM_BOYS_PER_COMPANY}_NUM_OF_COMPANIES_{NUM_OF_COMPANIES}.pkl", 'wb') as file:
+            pkl.dump(fig,file)
 
 
 
@@ -113,12 +123,18 @@ for NUM_BOYS_PER_COMPANY in [1,2,3]:
         plt.ylabel("Frequency")
         plt.legend(loc='upper right')
 
+        with open(f"data/graph_dist_hist_NUM_BOYS_{NUM_BOYS}_BIKE_SPEED_{BIKE_SPEED}__NUM_BOYS_PER_COMPANY_{NUM_BOYS_PER_COMPANY}_NUM_OF_COMPANIES_{NUM_OF_COMPANIES}.pkl", 'wb') as file:
+            pkl.dump(fig,file)
+
         plt.figure('Wait Time Histogram')
         plt.title(f"NUM_BOYS = {NUM_BOYS}, NUM_BOYS_PER_COMPANY = {NUM_BOYS_PER_COMPANY}, BIKE_SPEED = {BIKE_SPEED}, NUM_OF_COMPANIES = {NUM_OF_COMPANIES}")
         plt.hist(wait, bins2, label='Decentralised')
         plt.xlabel("Wait Time (mins)")
         plt.ylabel("Frequency")
         plt.legend(loc='upper right')
+
+        with open(f"data/graph_wait_time_hist_NUM_BOYS_{NUM_BOYS}_BIKE_SPEED_{BIKE_SPEED}__NUM_BOYS_PER_COMPANY_{NUM_BOYS_PER_COMPANY}_NUM_OF_COMPANIES_{NUM_OF_COMPANIES}.pkl", 'wb') as file:
+            pkl.dump(fig,file)
 
 
 
