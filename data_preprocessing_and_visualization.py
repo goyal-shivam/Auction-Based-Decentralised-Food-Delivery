@@ -8,6 +8,7 @@ from pprint import pprint
 from matplotlib import pyplot as plt
 import pickle
 from collections import Counter
+import random
 
 data = pd.read_pickle('data/data_27_cols.pkl')
 
@@ -104,6 +105,12 @@ pprint(dict(c))
 print(len(dict(c)))
 
 data.sort_values('order_place', inplace=True)
+
+order_cost = []
+for i in range(len(data)):
+    order_cost.append(random.randint(500,3000))
+
+data['order_cost'] = order_cost
 
 data.to_pickle('data/mumbai_7_days_data.pkl')
 
