@@ -37,6 +37,8 @@ for NUM_BOYS_PER_COMPANY in [10]:
         fig = plt.figure(f'Queue Length vs Time')
         plt.title(f"NUM_BOYS = {NUM_BOYS}, NUM_BOYS_PER_COMPANY = {NUM_BOYS_PER_COMPANY}, BIKE_SPEED = {BIKE_SPEED}, NUM_OF_COMPANIES = {NUM_OF_COMPANIES}")
         plt.plot(x,y, color=queue_length_colour[0])
+        plt.xlabel("Time into Simulation")
+        plt.ylabel("Waiting Queue Length")
 
         res = np.average(y)
         plt.axhline(np.average(y),0, np.amax(x), color=average_line_colours[0])
