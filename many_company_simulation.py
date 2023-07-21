@@ -68,7 +68,7 @@ def save_data(curr_time):
         # print()
 
 
-data = pd.read_pickle('data/mumbai_7_days_data.pkl')
+data, dataset_acronym = pd.read_pickle('data/mumbai_all_in_one_day.pkl'), 'ONEDAY'
 pd.options.display.max_rows = None
 pd.options.display.max_columns = 4
 
@@ -142,7 +142,7 @@ max_dist = 66.00012665542367
 '''
 
 class Customer:
-    def __init__(self, env, boys, name, res_lat, res_long, client_lat, client_long, company):
+    def __init__(self, env, boys, name, res_lat, res_long, client_lat, client_long, company, order_num):
         self.env = env
         self.boys = boys
         self.name = name
@@ -155,6 +155,8 @@ class Customer:
         self.bike_reach_restaurant_at = None
         self.company = company
         self.start_time = 0
+
+        self.order_num = order_num
 
     def action(self):
         global NUM_CUSTOMERS, ORDER_DATA
@@ -182,6 +184,7 @@ class Customer:
         NUM_CUSTOMERS -= 1
         save_data(self.env.now)
         ORDER_DATA.append((dist1+dist2, self.env.now-self.start_time))
+        print(f'{self.order_num}, ', end='',flush=True)
 
 
 def customer_generator(env, boys):
@@ -205,7 +208,8 @@ def customer_generator(env, boys):
             res_long=data.iat[i,2],
             client_lat=data.iat[i,3],
             client_long=data.iat[i,4],
-            company=company_allot[i]
+            company=company_allot[i],
+            order_num=i
         )
 
         env.process(c.action())
@@ -230,10 +234,10 @@ for i in LOG_DATA:
 x = np.array(x)
 y = np.array(y)
 
-with open(f"data/NUM_BOYS_{NUM_BOYS}_BIKE_SPEED_{BIKE_SPEED}_NUM_BOYS_PER_COMPANY_{NUM_BOYS_PER_COMPANY}_NUM_OF_COMPANIES_{NUM_OF_COMPANIES}_centralised.pkl", 'wb') as file:
+with open(f"data/{dataset_acronym}_NUM_BOYS_{NUM_BOYS}_BIKE_SPEED_{BIKE_SPEED}_NUM_BOYS_PER_COMPANY_{NUM_BOYS_PER_COMPANY}_NUM_OF_COMPANIES_{NUM_OF_COMPANIES}_centralised.pkl", 'wb') as file:
     pkl.dump((x,y), file)
 
-with open(f"data/NUM_BOYS_{NUM_BOYS}_BIKE_SPEED_{BIKE_SPEED}__NUM_BOYS_PER_COMPANY_{NUM_BOYS_PER_COMPANY}_NUM_OF_COMPANIES_{NUM_OF_COMPANIES}_ORDER_DATA_centralised.pkl", 'wb') as file:
+with open(f"data/{dataset_acronym}_NUM_BOYS_{NUM_BOYS}_BIKE_SPEED_{BIKE_SPEED}__NUM_BOYS_PER_COMPANY_{NUM_BOYS_PER_COMPANY}_NUM_OF_COMPANIES_{NUM_OF_COMPANIES}_ORDER_DATA_centralised.pkl", 'wb') as file:
     pkl.dump(ORDER_DATA, file)
 
 

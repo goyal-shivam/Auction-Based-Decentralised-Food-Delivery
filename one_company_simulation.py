@@ -16,11 +16,13 @@ NUM_OF_COMPANIES = 20
 NUM_BOYS = NUM_BOYS_PER_COMPANY * NUM_OF_COMPANIES # 20 maybe
 BIKE_SPEED = 40
 
+K_MEANS_DIST = 5
 
 BOYS = []
 LOG_DATA = []
 ORDER_DATA = [] # distance, time
 NUM_CUSTOMERS = 0
+K_MEANS_DATA = []
 
 MAX_LAT, MIN_LAT, MAX_LONG, MIN_LONG = 0,0,0,0
 
@@ -32,10 +34,13 @@ def dist(lat1, long1, lat2, long2):
 def man_dist(lat1, long1, lat2, long2):
     return dist(lat1, long1, lat2, long1) + dist(lat2, long1, lat2, long2)
 
-def get_index_of_nearest_boy(lat,long,time_now):
+def get_index_of_nearest_boy(lat,long,time_now,order_num):
     min_time = 1000000000
     min_ind = -1
     dist_corresponding_to_min = 1000000000
+    
+    global K_MEANS_DATA
+    nearby_bikers = 0
 
     for i in range(NUM_BOYS):
         new_time = BOYS[i]['free_at']
@@ -44,11 +49,16 @@ def get_index_of_nearest_boy(lat,long,time_now):
         dist = man_dist(lat, long, BOYS[i]['lat'], BOYS[i]['long'])
 
         new_time += ceil((dist/BIKE_SPEED)*60)
+
+        if(new_time-time_now<=ceil((K_MEANS_DIST/BIKE_SPEED)*60)):
+           nearby_bikers += 1
+           
         if(min_time > new_time):
             min_ind = i
             min_time = new_time
             dist_corresponding_to_min = dist
 
+    K_MEANS_DATA.append((order_num, nearby_bikers))
     return min_ind, min_time, dist_corresponding_to_min
 
 def save_data(curr_time):
@@ -66,7 +76,7 @@ def save_data(curr_time):
         LOG_DATA.append((curr_time, NUM_CUSTOMERS))
         # print()
 
-data = pd.read_pickle('data/mumbai_7_days_data.pkl')
+data, dataset_acronym = pd.read_pickle('data/mumbai_all_in_one_day.pkl'), 'ONEDAY'
 pd.options.display.max_rows = None
 pd.options.display.max_columns = 4
 
@@ -130,7 +140,7 @@ max_dist = 66.00012665542367
 '''
 
 class Customer:
-    def __init__(self, env, boys, name, res_lat, res_long, client_lat, client_long):
+    def __init__(self, env, boys, name, res_lat, res_long, client_lat, client_long, order_num):
         self.env = env
         self.boys = boys
         self.name = name
@@ -143,6 +153,8 @@ class Customer:
         self.bike_reach_restaurant_at = None
         self.start_time = 0
 
+        self.order_num = order_num
+
     def action(self):
         global NUM_CUSTOMERS, ORDER_DATA
 
@@ -151,7 +163,7 @@ class Customer:
 
         self.start_time = self.env.now
 
-        self.bike_ind, self.bike_reach_restaurant_at, dist1 = get_index_of_nearest_boy(self.res_lat, self.res_long, env.now)
+        self.bike_ind, self.bike_reach_restaurant_at, dist1 = get_index_of_nearest_boy(self.res_lat, self.res_long, self.env.now, self.order_num)
 
         yield env.timeout(self.bike_reach_restaurant_at - self.env.now)
 
@@ -169,6 +181,7 @@ class Customer:
         NUM_CUSTOMERS -= 1
         save_data(self.env.now)
         ORDER_DATA.append((dist1+dist2, self.env.now-self.start_time))
+        print(f'{self.order_num}, ', end='',flush=True)
 
 
 def customer_generator(env, boys):
@@ -189,7 +202,8 @@ def customer_generator(env, boys):
             res_lat=data.iat[i,1],
             res_long=data.iat[i,2],
             client_lat=data.iat[i,3],
-            client_long=data.iat[i,4]
+            client_long=data.iat[i,4],
+            order_num=i
         )
 
         env.process(c.action())
@@ -214,11 +228,14 @@ for i in LOG_DATA:
 x = np.array(x)
 y = np.array(y)
 
-with open(f"data/NUM_BOYS_{NUM_BOYS}_BIKE_SPEED_{BIKE_SPEED}_NUM_BOYS_PER_COMPANY_{NUM_BOYS_PER_COMPANY}_NUM_OF_COMPANIES_{NUM_OF_COMPANIES}_decent.pkl", 'wb') as file:
+with open(f"data/{dataset_acronym}_NUM_BOYS_{NUM_BOYS}_BIKE_SPEED_{BIKE_SPEED}_NUM_BOYS_PER_COMPANY_{NUM_BOYS_PER_COMPANY}_NUM_OF_COMPANIES_{NUM_OF_COMPANIES}_decent.pkl", 'wb') as file:
     pkl.dump((x,y), file)
 
-with open(f"data/NUM_BOYS_{NUM_BOYS}_BIKE_SPEED_{BIKE_SPEED}__NUM_BOYS_PER_COMPANY_{NUM_BOYS_PER_COMPANY}_NUM_OF_COMPANIES_{NUM_OF_COMPANIES}_ORDER_DATA.pkl", 'wb') as file:
+with open(f"data/{dataset_acronym}_NUM_BOYS_{NUM_BOYS}_BIKE_SPEED_{BIKE_SPEED}__NUM_BOYS_PER_COMPANY_{NUM_BOYS_PER_COMPANY}_NUM_OF_COMPANIES_{NUM_OF_COMPANIES}_ORDER_DATA.pkl", 'wb') as file:
     pkl.dump(ORDER_DATA, file)
+
+with open(f"data/{dataset_acronym}_NUM_BOYS_{NUM_BOYS}_BIKE_SPEED_{BIKE_SPEED}__NUM_BOYS_PER_COMPANY_{NUM_BOYS_PER_COMPANY}_NUM_OF_COMPANIES_{NUM_OF_COMPANIES}_K_DIST_{K_MEANS_DIST}_K_MEANS_DATA.pkl", 'wb') as file:
+    pkl.dump(K_MEANS_DATA, file)
 
 
 
