@@ -36,10 +36,10 @@ for i in range(len(data)):
     ):
         data.iat[i,10] += pd.Timedelta(11, 'hours')
 
-# shifting all order dates to 1 to 7th April
+# shifting all order dates to 1st April
 for i in range(len(data)):
     data.iat[i,10] = data.iat[i,10].replace(
-        day=(data.iat[i,10].day % 7)+1,
+        day=1,
         month=4
     )
 
@@ -55,13 +55,6 @@ for i in range(len(data)):
             second=0
         )
     )
-
-    # green_date_set.add(data.iat[i,10].replace(
-    #         hour=6, minute=0, second=0))
-    # green_date_set.add(data.iat[i,10].replace(
-    #         hour=12, minute=0, second=0))
-    # green_date_set.add(data.iat[i,10].replace(
-    #         hour=18, minute=0, second=0))
 
     for j in range(1,24):
         green_date_set.add(data.iat[i,10].replace(
@@ -112,7 +105,7 @@ for i in range(len(data)):
 
 data['order_cost'] = order_cost
 
-data.to_pickle('data/mumbai_7_days_data.pkl')
+data.to_pickle('data/mumbai_all_in_one_day.pkl')
 
 
 plt.show()
