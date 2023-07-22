@@ -25,7 +25,7 @@ for calculating 1st, 2nd and 3rd iteration bid of the rider, input to the functi
 
 
 SIMULATING RESTAURANT OWNER BEHAVIOUR WHILE BIDDING
-dependent on value of the food order
+dependent on value of the food order and rating of the rider
 discussed with uday
 
 

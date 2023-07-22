@@ -6,7 +6,7 @@ from matplotlib import pyplot as plt
 from collections import Counter
 import geopy.distance
 import simpy
-from random import randrange
+import random
 from math import ceil
 import numpy as np
 import pickle as pkl
@@ -16,7 +16,8 @@ NUM_OF_COMPANIES = 20
 NUM_BOYS = NUM_BOYS_PER_COMPANY * NUM_OF_COMPANIES # 20 maybe
 BIKE_SPEED = 40
 
-K_MEANS_DIST = 5
+K_MEANS_DIST = 4
+AUCTION_K = 5
 
 BOYS = []
 LOG_DATA = []
@@ -26,6 +27,8 @@ K_MEANS_DATA = []
 
 MAX_LAT, MIN_LAT, MAX_LONG, MIN_LONG = 0,0,0,0
 
+data = None
+
 def dist(lat1, long1, lat2, long2):
     # returns the distance between two points by 
     # shortest distance on surface of earth
@@ -33,6 +36,76 @@ def dist(lat1, long1, lat2, long2):
 
 def man_dist(lat1, long1, lat2, long2):
     return dist(lat1, long1, lat2, long1) + dist(lat2, long1, lat2, long2)
+
+def machine_predicted_bid(rider_ind, order_cost):
+    # rider_ind is the index of the delivery boy in the BOYS array
+    pass
+
+def first_bid(rider_ind, order_cost):
+    # rider_ind is the index of the delivery boy in the BOYS array
+    pass
+
+def second_bid(rider_ind, order_cost):
+    # rider_ind is the index of the delivery boy in the BOYS array
+    pass
+
+def third_bid(rider_ind, order_cost):
+    # rider_ind is the index of the delivery boy in the BOYS array
+    pass
+
+def customer_rating(order_num, rider_ind, order_cost):
+    rating = None
+
+    return rating
+
+def update_rider_rating(customer_rating, wait_time, dist_between_rest_and_cust):
+    pass
+
+def simulate_restaurant_owner(bids_df, order_cost):
+    
+
+
+    return bids_df
+
+def perform_auction(riders_ind_list, order_cost):
+    # min_bid = ceil(order_cost * 0.1)
+    # max_bid = ceil(order_cost * 0.2)
+    first_bid_res = []
+    second_bid_res = []
+    third_bid_res = []
+    ratings = []
+
+    for i in riders_ind_list:
+        first_bid_res.append(first_bid(i,order_cost))
+        second_bid_res.append(second_bid(i,order_cost))
+        third_bid_res.append(third_bid(i,order_cost))
+        ratings.append(BOYS[i]['rating'])
+
+    bids = {
+        'rider_ind' : riders_ind_list, 
+        'first_bid': first_bid_res, 
+        'second_bid': second_bid_res, 
+        'third_bid': third_bid_res,
+        'rider_rating': ratings
+        }
+    
+    bids_df = pd.DataFrame(bids)
+    bids_df.set_index('rider_ind', drop=False, inplace=True)
+    bids_df = simulate_restaurant_owner(bids_df, order_cost)
+
+    chosen_rider = random.choices(list(bids_df['rider_ind']), weights=list(bids_df['selection_prob']))
+
+    delivery_charges = random.choices(
+        [
+            bids_df[chosen_rider]['first_bid'],
+            bids_df[chosen_rider]['second_bid'],
+            bids_df[chosen_rider]['third_bid'],
+        ],
+        weights=[1,9,90]
+        # weights=[10,20,70]
+    )
+    
+    return chosen_rider, delivery_charges
 
 def get_index_of_nearest_boy(lat,long,time_now,order_num):
     min_time = 1000000000
@@ -95,14 +168,14 @@ N = len(data)
 
 
 for i in range(NUM_BOYS):
-    BOYS.append({'lat':randrange(10001), 'long':randrange(10001)})
+    BOYS.append({'lat':random.randrange(10001), 'long':random.randrange(10001)})
 
 for i in range(NUM_BOYS):
     BOYS[i]['lat'] = MIN_LAT + (MAX_LAT - MIN_LAT)*BOYS[i]['lat']/10000
     BOYS[i]['long'] = MIN_LONG + (MAX_LONG - MIN_LONG)*BOYS[i]['long']/10000
     BOYS[i]['free_at'] = 0
 
-'''
+''' free_in explanation
 if BOYS['free_in'] == 0:
     then it means that the location of the boy is at it lat, long. else if the free_in has some value, it means that at free_at time in the simulation environment in minutes, the boy will become free, and then it's location will become equal to lat,long which is currently stored in it's entry
 
