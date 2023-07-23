@@ -55,9 +55,7 @@ def first_bid (machine_bid, order):
         return max_bid(order)
     
 def second_bid (machine_bid, order):
-#     print(machine_bid)
     a = first_bid(machine_bid, order)
-#     print(a)
     return random.randint(machine_bid + 1, a)
 
 def third_bid (machine_bid, order):
@@ -78,23 +76,27 @@ def simulate_restaurant_owner(bids_df, order_cost):
     return bids_df
 
 def perform_auction(riders_ind_list, order_cost):
-    min_bid_res = []
-    max_bid_res = []
+    min_bid_res = min_bid(order_cost)
+    max_bid_res = max_bid(order_cost)
+    machine_predicted_bid_res = []
     first_bid_res = []
     second_bid_res = []
     third_bid_res = []
     ratings = []
 
     for i in riders_ind_list:
-        min_bid_res.append(min_bid(order_cost))
-        max_bid_res.append(max_bid(order_cost))
-        first_bid_res.append(first_bid(i,order_cost))
-        second_bid_res.append(second_bid(i,order_cost))
-        third_bid_res.append(third_bid(i,order_cost))
+        machine_predicted_bid_res.append(machine_predicted_bid(i, order_cost))
+        first_bid_res.append(first_bid(machine_predicted_bid_res[-1], order_cost))
+        second_bid_res.append(second_bid(machine_predicted_bid_res[-1], order_cost))
+        third_bid_res.append(third_bid(machine_predicted_bid_res[-1], order_cost))
+        # first_bid_res.append(first_bid(i,order_cost))
+        # second_bid_res.append(second_bid(i,order_cost))
+        # third_bid_res.append(third_bid(i,order_cost))
         ratings.append(BOYS[i]['rating'])
 
     bids = {
         'rider_ind' : riders_ind_list, 
+        'machine_predicted_bid': machine_predicted_bid_res,
         'first_bid': first_bid_res, 
         'second_bid': second_bid_res, 
         'third_bid': third_bid_res,
