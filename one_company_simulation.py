@@ -37,21 +37,31 @@ def dist(lat1, long1, lat2, long2):
 def man_dist(lat1, long1, lat2, long2):
     return dist(lat1, long1, lat2, long1) + dist(lat2, long1, lat2, long2)
 
+def min_bid (order):
+    return order * 0.1
+
+def max_bid (order):
+    return order * 0.2
+
 def machine_predicted_bid(rider_ind, order_cost):
     # rider_ind is the index of the delivery boy in the BOYS array
     pass
 
-def first_bid(rider_ind, order_cost):
-    # rider_ind is the index of the delivery boy in the BOYS array
-    pass
+def first_bid (machine_bid, order):
+    a = (machine_bid - min_bid(order)) * 2 + min_bid(order)
+    if a < max_bid(order):
+        return random.randint(a, max_bid(order))
+    else:
+        return max_bid(order)
+    
+def second_bid (machine_bid, order):
+#     print(machine_bid)
+    a = first_bid(machine_bid, order)
+#     print(a)
+    return random.randint(machine_bid + 1, a)
 
-def second_bid(rider_ind, order_cost):
-    # rider_ind is the index of the delivery boy in the BOYS array
-    pass
-
-def third_bid(rider_ind, order_cost):
-    # rider_ind is the index of the delivery boy in the BOYS array
-    pass
+def third_bid (machine_bid, order):
+    return random.randint(int(machine_bid / 1.5), machine_bid)
 
 def customer_rating(order_num, rider_ind, order_cost):
     rating = None
@@ -68,14 +78,16 @@ def simulate_restaurant_owner(bids_df, order_cost):
     return bids_df
 
 def perform_auction(riders_ind_list, order_cost):
-    # min_bid = ceil(order_cost * 0.1)
-    # max_bid = ceil(order_cost * 0.2)
+    min_bid_res = []
+    max_bid_res = []
     first_bid_res = []
     second_bid_res = []
     third_bid_res = []
     ratings = []
 
     for i in riders_ind_list:
+        min_bid_res.append(min_bid(order_cost))
+        max_bid_res.append(max_bid(order_cost))
         first_bid_res.append(first_bid(i,order_cost))
         second_bid_res.append(second_bid(i,order_cost))
         third_bid_res.append(third_bid(i,order_cost))
@@ -91,7 +103,7 @@ def perform_auction(riders_ind_list, order_cost):
     
     bids_df = pd.DataFrame(bids)
     bids_df.set_index('rider_ind', drop=False, inplace=True)
-    bids_df = simulate_restaurant_owner(bids_df, order_cost)
+    bids_df = simulate_restaurant_owner(bids_df, order_cost, min_bid, max_bid)
 
     chosen_rider = random.choices(list(bids_df['rider_ind']), weights=list(bids_df['selection_prob']))
 
