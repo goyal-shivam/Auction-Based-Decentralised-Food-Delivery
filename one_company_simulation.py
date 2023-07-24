@@ -45,7 +45,12 @@ def max_bid (order):
 
 def machine_predicted_bid(rider_ind, order_cost):
     # rider_ind is the index of the delivery boy in the BOYS array
-    pass
+    
+    rating = BOYS[rider_ind]['rating']
+    min_bid_res = min_bid(order_cost)
+    max_bid_res = max_bid(order_cost)
+    
+    return (max_bid_res - min_bid_res)*(np.exp(0.5*rating) - 1)/(np.exp(0.5*5) - 1) + min_bid_res
 
 def first_bid (machine_bid, order):
     a = (machine_bid - min_bid(order)) * 2 + min_bid(order)
@@ -61,13 +66,23 @@ def second_bid (machine_bid, order):
 def third_bid (machine_bid, order):
     return random.randint(int(machine_bid / 1.5), machine_bid)
 
-def customer_rating(order_num, rider_ind, order_cost):
-    rating = None
+def customer_rating(actual_wait_time, min_wait_time):
+    '''
+    actual_wait_time is the time that the customer had to wait to receive the order after placing the order
+    min_wait_time is the time required for the delivery boy to travel from restaurant to client location
+    '''
+    return 5*(np.exp(-((actual_wait_time-min_wait_time)/min_wait_time*np.log(2))))
 
-    return rating
+def update_rider_rating(customer_rating, rider_ind):
+    rider_data = data.iloc[rider_ind]
 
-def update_rider_rating(customer_rating, wait_time, dist_between_rest_and_cust):
-    pass
+    # create global variable to store min and max wait time
+    older_rating = rider_data['rating']
+    k = np.exp(-rider_data['num_rides'])
+    
+    rating_update = 0.2*np.exp(k*(abs(customer_rating-older_rating) - 5))
+
+    return older_rating + np.sign(customer_rating-older_rating)*(rating_update) # we want maximum 0.1 change in rating, so we multiply by 0.02, so that even when difference in rating is 5, the final increment/decrement in rating is less than 0.1 only
 
 def simulate_restaurant_owner(bids_df, order_cost):
     
@@ -188,6 +203,8 @@ for i in range(NUM_BOYS):
     BOYS[i]['lat'] = MIN_LAT + (MAX_LAT - MIN_LAT)*BOYS[i]['lat']/10000
     BOYS[i]['long'] = MIN_LONG + (MAX_LONG - MIN_LONG)*BOYS[i]['long']/10000
     BOYS[i]['free_at'] = 0
+    BOYS[i]['num_rides'] = 0
+    BOYS[i]['rating'] = 3
 
 ''' free_in explanation
 if BOYS['free_in'] == 0:
@@ -267,6 +284,7 @@ class Customer:
 
         NUM_CUSTOMERS -= 1
         save_data(self.env.now)
+        BOYS[self.bike_ind]['num_rides'] += 1
         ORDER_DATA.append((dist1+dist2, self.env.now-self.start_time))
         print(f'{self.order_num}, ', end='',flush=True)
 
