@@ -15,6 +15,9 @@ NUM_BOYS_PER_COMPANY = 10 # 4 maybe
 NUM_OF_COMPANIES = 20
 NUM_BOYS = NUM_BOYS_PER_COMPANY * NUM_OF_COMPANIES # 20 maybe
 BIKE_SPEED = 40
+AVERAGE_RIDER_RATING = 2500
+AVERAGE_CUSTOMER_RATING = 2.5
+NUM_ORDERS_DONE = 0
 
 K_MEANS_DIST = 4
 AUCTION_K = 5
@@ -71,22 +74,24 @@ def customer_rating(actual_wait_time, min_wait_time):
     actual_wait_time is the time that the customer had to wait to receive the order after placing the order
     min_wait_time is the time required for the delivery boy to travel from restaurant to client location
     '''
+
     return 5*(np.exp(-((actual_wait_time-min_wait_time)/min_wait_time*np.log(2))))
 
 def update_rider_rating(customer_rating, rider_ind):
+    global AVERAGE_RIDER_RATING, AVERAGE_CUSTOMER_RATING
+
     rider_data = data.iloc[rider_ind]
-
-    # create global variable to store min and max wait time
     older_rating = rider_data['rating']
-    k = np.exp(-rider_data['num_rides'])
-    
-    rating_update = 0.2*np.exp(k*(abs(customer_rating-older_rating) - 5))
 
-    return older_rating + np.sign(customer_rating-older_rating)*(rating_update) # we want maximum 0.1 change in rating, so we multiply by 0.02, so that even when difference in rating is 5, the final increment/decrement in rating is less than 0.1 only
+    e = 1/(1+10**((AVERAGE_RIDER_RATING-older_rating)/800))
+
+    return older_rating + 32*((1 if customer_rating > AVERAGE_CUSTOMER_RATING*0.8 else 0)-e)
 
 def simulate_restaurant_owner(bids_df, order_cost):
     
+    k = (order_cost-500)*(5000-0)/(3000-500) + 0
 
+    bids_df['selection_prob'] = np.exp(-(((bids_df['rider_rating']-k)/2000)**2))
 
     return bids_df
 
@@ -104,9 +109,6 @@ def perform_auction(riders_ind_list, order_cost):
         first_bid_res.append(first_bid(machine_predicted_bid_res[-1], order_cost))
         second_bid_res.append(second_bid(machine_predicted_bid_res[-1], order_cost))
         third_bid_res.append(third_bid(machine_predicted_bid_res[-1], order_cost))
-        # first_bid_res.append(first_bid(i,order_cost))
-        # second_bid_res.append(second_bid(i,order_cost))
-        # third_bid_res.append(third_bid(i,order_cost))
         ratings.append(BOYS[i]['rating'])
 
     bids = {
@@ -130,7 +132,8 @@ def perform_auction(riders_ind_list, order_cost):
             bids_df[chosen_rider]['second_bid'],
             bids_df[chosen_rider]['third_bid'],
         ],
-        weights=[1,9,90]
+        # weights=[1,9,90]
+        weights=[10,35,55]
         # weights=[10,20,70]
     )
     
