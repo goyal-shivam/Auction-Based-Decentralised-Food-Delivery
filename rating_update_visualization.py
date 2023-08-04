@@ -25,7 +25,8 @@ for i,j in enumerate(customer_rating):
 plt.plot(rating_history, 'r+')
 
 # plt.plot(customer_rating, color='blue', marker='o', linestyle='dashed',linewidth=2, markersize=6)
-plt.plot(customer_rating, color='blue', marker='o', linewidth=2, markersize=6)
-plt.plot(rating_history, color='red', marker='x', linewidth=2, markersize=6)
-plt.legend(['Customer Ratings', 'Rider Rating'])
+plt.plot(customer_rating, color='blue', marker='o', linewidth=2, markersize=6, label='Customer Ratings')
+plt.plot(rating_history, color='red', marker='x', linewidth=2, markersize=6, label='Rider Rating')
+# plt.legend(['Customer Ratings', 'Rider Rating'])
+plt.legend()
 plt.show()
