@@ -71,4 +71,7 @@ graphs to be generated for the auction mechanism
 perform auction between ceil(total_riders/20) nearest riders, basically return list of their indices to perform_auction function, and get the index of the chosen rider and delivery_charges
 
 
-total rider_earnings, rider ratings ka histogram, and total value graph as the simulation progresses
+inta sab nhi rakhte, sirf per order ka delivery charges and customer_rating rakhte hain, that's it
+        total rider_earnings, rider ratings ka histogram, and total value graph as the simulation progresses, customer_ratings ka histogram
+
+update average_customer_rating and average_rider_rating in both the simulations

@@ -18,6 +18,7 @@ BIKE_SPEED = 40
 AVERAGE_RIDER_RATING = 2500
 AVERAGE_CUSTOMER_RATING = 2.5
 NUM_ORDERS_DONE = 0
+NUM_BOYS_IN_AUCTION = ceil(NUM_BOYS/20)
 
 K_MEANS_DIST = 4
 AUCTION_K = 5
@@ -27,6 +28,7 @@ LOG_DATA = []
 ORDER_DATA = [] # distance, time
 NUM_CUSTOMERS = 0
 K_MEANS_DATA = []
+DELIVERY_CHARGES_RATING = [] # delivery charges, customer rating for this order
 
 MAX_LAT, MIN_LAT, MAX_LONG, MIN_LONG = 0,0,0,0
 
@@ -78,14 +80,19 @@ def customer_rating(actual_wait_time, min_wait_time):
     return 5*(np.exp(-((actual_wait_time-min_wait_time)/min_wait_time*np.log(2))))
 
 def update_rider_rating(customer_rating, rider_ind):
-    global AVERAGE_RIDER_RATING, AVERAGE_CUSTOMER_RATING
+    global AVERAGE_RIDER_RATING, AVERAGE_CUSTOMER_RATING, NUM_ORDERS_DONE, BOYS
 
-    rider_data = data.iloc[rider_ind]
-    older_rating = rider_data['rating']
+    older_rating = BOYS[rider_ind]['rating']
 
     e = 1/(1+10**((AVERAGE_RIDER_RATING-older_rating)/800))
+    change = 32*((1 if customer_rating > AVERAGE_CUSTOMER_RATING*0.8 else 0)-e)
 
-    return older_rating + 32*((1 if customer_rating > AVERAGE_CUSTOMER_RATING*0.8 else 0)-e)
+    BOYS[rider_ind]['rating'] = older_rating + change
+
+    AVERAGE_CUSTOMER_RATING = (AVERAGE_CUSTOMER_RATING*NUM_ORDERS_DONE + customer_rating)/(NUM_ORDERS_DONE + 1)
+    NUM_ORDERS_DONE += 1
+
+    AVERAGE_RIDER_RATING = ((NUM_BOYS*AVERAGE_RIDER_RATING) + change)/NUM_BOYS
 
 def simulate_restaurant_owner(bids_df, order_cost):
     
@@ -94,6 +101,26 @@ def simulate_restaurant_owner(bids_df, order_cost):
     bids_df['selection_prob'] = np.exp(-(((bids_df['rider_rating']-k)/2000)**2))
 
     return bids_df
+
+def generate_bikers_ind_list(lat,long,num,time_now):
+    reach_by = []
+    # array that will store index of all riders, and the time in simulation by which they can reach the restaurant given
+
+    for i in range(NUM_BOYS):
+        time_to_reach = BOYS[i]['free_at']
+        if(time_to_reach <=time_now):
+            time_to_reach = time_now
+
+        time_to_reach += man_dist(BOYS[i]['lat'], BOYS[i]['long'], lat, long)
+        reach_by.append(i, time_to_reach)
+
+    reach_by.sort(key=lambda x:x[1])
+
+    result = []
+    for i in range(num):
+        result.append(reach_by[i][0])
+
+    return result
 
 def perform_auction(riders_ind_list, order_cost):
     min_bid_res = min_bid(order_cost)
@@ -207,7 +234,7 @@ for i in range(NUM_BOYS):
     BOYS[i]['long'] = MIN_LONG + (MAX_LONG - MIN_LONG)*BOYS[i]['long']/10000
     BOYS[i]['free_at'] = 0
     BOYS[i]['num_rides'] = 0
-    BOYS[i]['rating'] = 3
+    BOYS[i]['rating'] = 2500
 
 ''' free_in explanation
 if BOYS['free_in'] == 0:
@@ -247,7 +274,7 @@ max_dist = 66.00012665542367
 '''
 
 class Customer:
-    def __init__(self, env, boys, name, res_lat, res_long, client_lat, client_long, order_num):
+    def __init__(self, env, boys, name, res_lat, res_long, client_lat, client_long, order_num, order_cost):
         self.env = env
         self.boys = boys
         self.name = name
@@ -255,22 +282,34 @@ class Customer:
         self.res_long = res_long
         self.client_lat = client_lat
         self.client_long = client_long
+        self.order_cost = order_cost
 
         self.bike_ind = None
         self.bike_reach_restaurant_at = None
         self.start_time = 0
 
         self.order_num = order_num
+        self.delivery_charges = None
 
     def action(self):
-        global NUM_CUSTOMERS, ORDER_DATA
+        global NUM_CUSTOMERS, ORDER_DATA, NUM_BOYS_IN_AUCTION, DELIVERY_CHARGES_RATING
 
         NUM_CUSTOMERS += 1
         save_data(self.env.now)
 
         self.start_time = self.env.now
 
-        self.bike_ind, self.bike_reach_restaurant_at, dist1 = get_index_of_nearest_boy(self.res_lat, self.res_long, self.env.now, self.order_num)
+        # self.bike_ind, self.bike_reach_restaurant_at, dist1 = get_index_of_nearest_boy(self.res_lat, self.res_long, self.env.now, self.order_num)
+
+        self.bike_ind, self.delivery_charges = perform_auction(generate_bikers_ind_list(self.res_lat, self.res_long, NUM_BOYS_IN_AUCTION, self.env.now), self.order_cost)
+
+        dist1 = man_dist(self.res_lat, self.res_long, BOYS[self.bike_ind]['lat'], BOYS[self.bike_ind]['long'])
+        self.bike_reach_restaurant_at = BOYS[self.bike_ind]['free_at']
+        
+        if(self.bike_reach_restaurant_at < self.env.now):
+            self.bike_reach_restaurant_at = self.env.now
+        
+        self.bike_reach_restaurant_at += ceil((dist1/BIKE_SPEED)*60)
 
         yield env.timeout(self.bike_reach_restaurant_at - self.env.now)
 
@@ -288,7 +327,13 @@ class Customer:
         NUM_CUSTOMERS -= 1
         save_data(self.env.now)
         BOYS[self.bike_ind]['num_rides'] += 1
-        ORDER_DATA.append((dist1+dist2, self.env.now-self.start_time))
+        actual_wait_time = self.env.now-self.start_time
+        ORDER_DATA.append((dist1+dist2, actual_wait_time))
+        rating_by_customer = customer_rating(actual_wait_time, time2)
+        DELIVERY_CHARGES_RATING.append(self.delivery_charges, rating_by_customer)
+
+        update_rider_rating(rating_by_customer, self.bike_ind)
+
         print(f'{self.order_num}, ', end='',flush=True)
 
 
@@ -311,7 +356,8 @@ def customer_generator(env, boys):
             res_long=data.iat[i,2],
             client_lat=data.iat[i,3],
             client_long=data.iat[i,4],
-            order_num=i
+            order_num=i,
+            order_cost=data.iat[i,27]
         )
 
         env.process(c.action())
@@ -341,6 +387,9 @@ with open(f"data/{dataset_acronym}_NUM_BOYS_{NUM_BOYS}_BIKE_SPEED_{BIKE_SPEED}_N
 
 with open(f"data/{dataset_acronym}_NUM_BOYS_{NUM_BOYS}_BIKE_SPEED_{BIKE_SPEED}__NUM_BOYS_PER_COMPANY_{NUM_BOYS_PER_COMPANY}_NUM_OF_COMPANIES_{NUM_OF_COMPANIES}_ORDER_DATA.pkl", 'wb') as file:
     pkl.dump(ORDER_DATA, file)
+
+with open(f"data/{dataset_acronym}_NUM_BOYS_{NUM_BOYS}_BIKE_SPEED_{BIKE_SPEED}__NUM_BOYS_PER_COMPANY_{NUM_BOYS_PER_COMPANY}_NUM_OF_COMPANIES_{NUM_OF_COMPANIES}_DELIVERY_CHARGES_RATING.pkl", 'wb') as file:
+    pkl.dump(DELIVERY_CHARGES_RATING, file)
 
 with open(f"data/{dataset_acronym}_NUM_BOYS_{NUM_BOYS}_BIKE_SPEED_{BIKE_SPEED}__NUM_BOYS_PER_COMPANY_{NUM_BOYS_PER_COMPANY}_NUM_OF_COMPANIES_{NUM_OF_COMPANIES}_K_DIST_{K_MEANS_DIST}_K_MEANS_DATA.pkl", 'wb') as file:
     pkl.dump(K_MEANS_DATA, file)
