@@ -43,10 +43,10 @@ def man_dist(lat1, long1, lat2, long2):
     return dist(lat1, long1, lat2, long1) + dist(lat2, long1, lat2, long2)
 
 def min_bid (order):
-    return order * 0.1
+    return ceil(order * 0.1)
 
 def max_bid (order):
-    return order * 0.2
+    return ceil(order * 0.2)
 
 def machine_predicted_bid(rider_ind, order_cost):
     # rider_ind is the index of the delivery boy in the BOYS array
@@ -132,10 +132,10 @@ def perform_auction(riders_ind_list, order_cost):
     ratings = []
 
     for i in riders_ind_list:
-        machine_predicted_bid_res.append(machine_predicted_bid(i, order_cost))
-        first_bid_res.append(first_bid(machine_predicted_bid_res[-1], order_cost))
-        second_bid_res.append(second_bid(machine_predicted_bid_res[-1], order_cost))
-        third_bid_res.append(third_bid(machine_predicted_bid_res[-1], order_cost))
+        machine_predicted_bid_res.append(int(machine_predicted_bid(i, order_cost)))
+        first_bid_res.append(int(first_bid(machine_predicted_bid_res[-1], order_cost)))
+        second_bid_res.append(int(second_bid(machine_predicted_bid_res[-1], order_cost)))
+        third_bid_res.append(int(third_bid(machine_predicted_bid_res[-1], order_cost)))
         ratings.append(BOYS[i]['rating'])
 
     bids = {
@@ -149,15 +149,35 @@ def perform_auction(riders_ind_list, order_cost):
     
     bids_df = pd.DataFrame(bids)
     bids_df.set_index('rider_ind', drop=False, inplace=True)
-    bids_df = simulate_restaurant_owner(bids_df, order_cost, min_bid, max_bid)
+    bids_df = simulate_restaurant_owner(bids_df, order_cost)
 
     chosen_rider = random.choices(list(bids_df['rider_ind']), weights=list(bids_df['selection_prob']))
 
+    chosen_rider = chosen_rider[0]
+    chosen_rider_data = bids_df.loc[chosen_rider]
+    
+    # print('----'*10)
+    # print(bids_df.columns)
+    # print('----'*10)
+    # print(chosen_rider)
+    # print('----'*10)
+    # print(chosen_rider_data)
+    # print('----'*10)
+    # pd.options.display.max_columns = None
+    # print(bids_df)
+    # print('----'*10)
+
     delivery_charges = random.choices(
         [
-            bids_df[chosen_rider]['first_bid'],
-            bids_df[chosen_rider]['second_bid'],
-            bids_df[chosen_rider]['third_bid'],
+            # bids_df[chosen_rider]['first_bid'],
+            # bids_df[chosen_rider]['second_bid'],
+            # bids_df[chosen_rider]['third_bid'],
+            # bids_df.iat[chosen_rider, 2],
+            # bids_df.iat[chosen_rider, 3],
+            # bids_df.iat[chosen_rider, 4],
+            chosen_rider_data['first_bid'],
+            chosen_rider_data['second_bid'],
+            chosen_rider_data['third_bid'],
         ],
         # weights=[1,9,90]
         weights=[10,35,55]

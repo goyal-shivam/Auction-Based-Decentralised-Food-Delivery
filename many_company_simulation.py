@@ -37,10 +37,10 @@ def man_dist(lat1, long1, lat2, long2):
     return dist(lat1, long1, lat2, long1) + dist(lat2, long1, lat2, long2)
 
 def min_bid (order):
-    return order * 0.1
+    return ceil(order * 0.1)
 
 def max_bid (order):
-    return order * 0.2
+    return ceil(order * 0.2)
 
 def machine_predicted_bid(rider_ind, order_cost):
     # rider_ind is the index of the delivery boy in the BOYS array
