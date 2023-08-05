@@ -51,18 +51,18 @@ def max_bid (order):
 def machine_predicted_bid(rider_ind, order_cost):
     # rider_ind is the index of the delivery boy in the BOYS array
     
-    rating = BOYS[rider_ind]['rating']
+    rating = BOYS[rider_ind]['rating']/1000
     min_bid_res = min_bid(order_cost)
     max_bid_res = max_bid(order_cost)
     
-    return (max_bid_res - min_bid_res)*(np.exp(0.5*rating) - 1)/(np.exp(0.5*5) - 1) + min_bid_res
+    return ceil((max_bid_res - min_bid_res)*(np.exp(0.5*rating) - 1)/(np.exp(0.5*5) - 1) + min_bid_res)
 
 def first_bid (machine_bid, order):
-    a = (machine_bid - min_bid(order)) * 2 + min_bid(order)
+    a = int((machine_bid - min_bid(order)) * 2 + min_bid(order))
     if a < max_bid(order):
         return random.randint(a, max_bid(order))
     else:
-        return max_bid(order)
+        return int(max_bid(order))
     
 def second_bid (machine_bid, order):
     a = first_bid(machine_bid, order)
@@ -112,7 +112,7 @@ def generate_bikers_ind_list(lat,long,num,time_now):
             time_to_reach = time_now
 
         time_to_reach += man_dist(BOYS[i]['lat'], BOYS[i]['long'], lat, long)
-        reach_by.append(i, time_to_reach)
+        reach_by.append((i, time_to_reach))
 
     reach_by.sort(key=lambda x:x[1])
 
@@ -330,7 +330,7 @@ class Customer:
         actual_wait_time = self.env.now-self.start_time
         ORDER_DATA.append((dist1+dist2, actual_wait_time))
         rating_by_customer = customer_rating(actual_wait_time, time2)
-        DELIVERY_CHARGES_RATING.append(self.delivery_charges, rating_by_customer)
+        DELIVERY_CHARGES_RATING.append((self.delivery_charges, rating_by_customer))
 
         update_rider_rating(rating_by_customer, self.bike_ind)
 
