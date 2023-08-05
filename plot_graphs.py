@@ -18,6 +18,7 @@ two average line colours
 '''
 queue_length_colour = ('#fc5c65', '#a55eea')
 average_line_colours = ('#10ac84', '#222f3e')
+acronym = 'ONEDAY_'
 
 '''
 NUM_BOYS_PER_COMPANY = 2 # 4 maybe
@@ -31,7 +32,7 @@ for NUM_BOYS_PER_COMPANY in [10]:
 
     # PLOT QUEUE LENGTH GRAPH
     if draw_queue > 0:
-        with open(f"data/NUM_BOYS_{NUM_BOYS}_BIKE_SPEED_{BIKE_SPEED}_NUM_BOYS_PER_COMPANY_{NUM_BOYS_PER_COMPANY}_NUM_OF_COMPANIES_{NUM_OF_COMPANIES}_decent.pkl", 'rb') as file:
+        with open(f"data/{acronym}NUM_BOYS_{NUM_BOYS}_BIKE_SPEED_{BIKE_SPEED}_NUM_BOYS_PER_COMPANY_{NUM_BOYS_PER_COMPANY}_NUM_OF_COMPANIES_{NUM_OF_COMPANIES}_decent.pkl", 'rb') as file:
             (x,y) = pkl.load(file)
 
         fig = plt.figure(f'Queue Length vs Time')
@@ -44,7 +45,7 @@ for NUM_BOYS_PER_COMPANY in [10]:
         plt.axhline(np.average(y),0, np.amax(x), color=average_line_colours[0])
 
         # SPACE FOR CENTRALISED VERSION
-        with open(f"data/NUM_BOYS_{NUM_BOYS}_BIKE_SPEED_{BIKE_SPEED}_NUM_BOYS_PER_COMPANY_{NUM_BOYS_PER_COMPANY}_NUM_OF_COMPANIES_{NUM_OF_COMPANIES}_centralised.pkl", 'rb') as file:
+        with open(f"data/{acronym}NUM_BOYS_{NUM_BOYS}_BIKE_SPEED_{BIKE_SPEED}_NUM_BOYS_PER_COMPANY_{NUM_BOYS_PER_COMPANY}_NUM_OF_COMPANIES_{NUM_OF_COMPANIES}_centralised.pkl", 'rb') as file:
             (x,y) = pkl.load(file)
 
         fig = plt.figure(f'Queue Length vs Time')
@@ -57,13 +58,13 @@ for NUM_BOYS_PER_COMPANY in [10]:
         plt.legend(["Decentralised", "Average Decentralised", "Centralised", "Average Centralised"])
 
         # saving graph
-        with open(f"data/graph_queue_length_NUM_BOYS_{NUM_BOYS}_BIKE_SPEED_{BIKE_SPEED}__NUM_BOYS_PER_COMPANY_{NUM_BOYS_PER_COMPANY}_NUM_OF_COMPANIES_{NUM_OF_COMPANIES}.pkl", 'wb') as file:
+        with open(f"data/{acronym}graph_queue_length_NUM_BOYS_{NUM_BOYS}_BIKE_SPEED_{BIKE_SPEED}__NUM_BOYS_PER_COMPANY_{NUM_BOYS_PER_COMPANY}_NUM_OF_COMPANIES_{NUM_OF_COMPANIES}.pkl", 'wb') as file:
             pkl.dump(fig,file)
 
 
     # PLOT WAIT TIME AND DISTANCE SUM GRAPHS
 
-    with open(f"data/NUM_BOYS_{NUM_BOYS}_BIKE_SPEED_{BIKE_SPEED}__NUM_BOYS_PER_COMPANY_{NUM_BOYS_PER_COMPANY}_NUM_OF_COMPANIES_{NUM_OF_COMPANIES}_ORDER_DATA.pkl", 'rb') as file:
+    with open(f"data/{acronym}NUM_BOYS_{NUM_BOYS}_BIKE_SPEED_{BIKE_SPEED}__NUM_BOYS_PER_COMPANY_{NUM_BOYS_PER_COMPANY}_NUM_OF_COMPANIES_{NUM_OF_COMPANIES}_ORDER_DATA.pkl", 'rb') as file:
             ORDER_DATA = pkl.load(file)
 
     dist = []
@@ -83,7 +84,7 @@ for NUM_BOYS_PER_COMPANY in [10]:
         sum_wait[i] += sum_wait[i-1]
 
 
-    with open(f"data/NUM_BOYS_{NUM_BOYS}_BIKE_SPEED_{BIKE_SPEED}__NUM_BOYS_PER_COMPANY_{NUM_BOYS_PER_COMPANY}_NUM_OF_COMPANIES_{NUM_OF_COMPANIES}_ORDER_DATA_centralised.pkl", 'rb') as file:
+    with open(f"data/{acronym}NUM_BOYS_{NUM_BOYS}_BIKE_SPEED_{BIKE_SPEED}__NUM_BOYS_PER_COMPANY_{NUM_BOYS_PER_COMPANY}_NUM_OF_COMPANIES_{NUM_OF_COMPANIES}_ORDER_DATA_centralised.pkl", 'rb') as file:
         ORDER_DATA = pkl.load(file)
 
 
@@ -122,7 +123,7 @@ for NUM_BOYS_PER_COMPANY in [10]:
         plt.ylabel("Total Distance travelled by Delivery boys (km)")
         plt.legend(["Decentralised", "Centralised"])
 
-        with open(f"data/graph_dist_sum_NUM_BOYS_{NUM_BOYS}_BIKE_SPEED_{BIKE_SPEED}__NUM_BOYS_PER_COMPANY_{NUM_BOYS_PER_COMPANY}_NUM_OF_COMPANIES_{NUM_OF_COMPANIES}.pkl", 'wb') as file:
+        with open(f"data/{acronym}graph_dist_sum_NUM_BOYS_{NUM_BOYS}_BIKE_SPEED_{BIKE_SPEED}__NUM_BOYS_PER_COMPANY_{NUM_BOYS_PER_COMPANY}_NUM_OF_COMPANIES_{NUM_OF_COMPANIES}.pkl", 'wb') as file:
             pkl.dump(fig,file)
 
 
@@ -133,7 +134,7 @@ for NUM_BOYS_PER_COMPANY in [10]:
         plt.plot(sum_wait2)
         plt.legend(["Decentralised", "Centralised"])
 
-        with open(f"data/graph_wait_time_sum_NUM_BOYS_{NUM_BOYS}_BIKE_SPEED_{BIKE_SPEED}__NUM_BOYS_PER_COMPANY_{NUM_BOYS_PER_COMPANY}_NUM_OF_COMPANIES_{NUM_OF_COMPANIES}.pkl", 'wb') as file:
+        with open(f"data/{acronym}graph_wait_time_sum_NUM_BOYS_{NUM_BOYS}_BIKE_SPEED_{BIKE_SPEED}__NUM_BOYS_PER_COMPANY_{NUM_BOYS_PER_COMPANY}_NUM_OF_COMPANIES_{NUM_OF_COMPANIES}.pkl", 'wb') as file:
             pkl.dump(fig,file)
 
 
@@ -156,7 +157,7 @@ for NUM_BOYS_PER_COMPANY in [10]:
         plt.ylabel("Frequency")
         plt.legend(loc='upper right')
 
-        with open(f"data/graph_dist_hist_NUM_BOYS_{NUM_BOYS}_BIKE_SPEED_{BIKE_SPEED}__NUM_BOYS_PER_COMPANY_{NUM_BOYS_PER_COMPANY}_NUM_OF_COMPANIES_{NUM_OF_COMPANIES}.pkl", 'wb') as file:
+        with open(f"data/{acronym}graph_dist_hist_NUM_BOYS_{NUM_BOYS}_BIKE_SPEED_{BIKE_SPEED}__NUM_BOYS_PER_COMPANY_{NUM_BOYS_PER_COMPANY}_NUM_OF_COMPANIES_{NUM_OF_COMPANIES}.pkl", 'wb') as file:
             pkl.dump(fig,file)
 
         fig = plt.figure('Wait Time Histogram')
@@ -166,7 +167,7 @@ for NUM_BOYS_PER_COMPANY in [10]:
         plt.ylabel("Frequency")
         plt.legend(loc='upper right')
 
-        with open(f"data/graph_wait_time_hist_NUM_BOYS_{NUM_BOYS}_BIKE_SPEED_{BIKE_SPEED}__NUM_BOYS_PER_COMPANY_{NUM_BOYS_PER_COMPANY}_NUM_OF_COMPANIES_{NUM_OF_COMPANIES}.pkl", 'wb') as file:
+        with open(f"data/{acronym}graph_wait_time_hist_NUM_BOYS_{NUM_BOYS}_BIKE_SPEED_{BIKE_SPEED}__NUM_BOYS_PER_COMPANY_{NUM_BOYS_PER_COMPANY}_NUM_OF_COMPANIES_{NUM_OF_COMPANIES}.pkl", 'wb') as file:
             pkl.dump(fig,file)
 
 
