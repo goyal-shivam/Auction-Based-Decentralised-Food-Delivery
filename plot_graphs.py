@@ -19,9 +19,11 @@ two average line colours
 queue_length_colour = ('#fc5c65', '#a55eea')
 average_line_colours = ('#10ac84', '#222f3e')
 acronym = 'ONEDAY_'
+dataset_acronym = 'ONEDAY'
 
 '''
 NUM_BOYS_PER_COMPANY = 2 # 4 maybe
+NUM_BOYS_PER_COMPANY = 10
 '''
 for NUM_BOYS_PER_COMPANY in [10]:
     NUM_OF_COMPANIES = 20
@@ -172,10 +174,70 @@ for NUM_BOYS_PER_COMPANY in [10]:
 
 
 
+    with open(f"data/{dataset_acronym}_NUM_BOYS_{NUM_BOYS}_BIKE_SPEED_{BIKE_SPEED}__NUM_BOYS_PER_COMPANY_{NUM_BOYS_PER_COMPANY}_NUM_OF_COMPANIES_{NUM_OF_COMPANIES}_DELIVERY_CHARGES_RATING.pkl", 'rb') as file:
+        DELIVERY_CHARGES_RATING = pkl.load(file)
+
+    charges, rating = [], []
+    charges2, rating2 = [], []
+
+    for i in DELIVERY_CHARGES_RATING:
+        charges.append(i[0])
+        rating.append(i[1])
+
+    with open(f"data/{dataset_acronym}_NUM_BOYS_{NUM_BOYS}_BIKE_SPEED_{BIKE_SPEED}__NUM_BOYS_PER_COMPANY_{NUM_BOYS_PER_COMPANY}_NUM_OF_COMPANIES_{NUM_OF_COMPANIES}_DELIVERY_CHARGES_RATING_centralised.pkl", 'rb') as file:
+        DELIVERY_CHARGES_RATING = pkl.load(file)
+
+    for i in DELIVERY_CHARGES_RATING:
+        charges2.append(i[0])
+        rating2.append(i[1])
+
+    charges = np.array(charges)
+    charges2 = np.array(charges2)
+    rating = np.array(rating)
+    rating2 = np.array(rating2)
+
+    # PLOT CUSTOMER RATINGS & DELIVERY CHARGES HISTOGRAMS
+    if (draw_hists>0):
+        bins = list(range(0,int(max(charges.max(),charges2.max())),10))
+        bins = np.array(bins)
+        # bins2 = list(range(0,int(max(rating.max(),rating2.max())),0.1))
+        # bins2 = np.array(bins2)
+        bins2 = np.linspace(0,5,25)
+        # bins = np.linspace(0, max(dist.max(),dist2.max()), 20)
+        # bins2 = np.linspace(0, max(wait.max(), wait2.max()), 20)
+
+        plt.style.use('seaborn-deep')
+        fig = plt.figure('Delivery Charges Histogram')
+        plt.title(f"NUM_BOYS = {NUM_BOYS}, NUM_BOYS_PER_COMPANY = {NUM_BOYS_PER_COMPANY}, BIKE_SPEED = {BIKE_SPEED}, NUM_OF_COMPANIES = {NUM_OF_COMPANIES}")
+        plt.hist([charges, charges2], bins, label=['Decentralised', 'Centralised'])
+        plt.xlabel("Delivery Charges (INR)")
+        plt.ylabel("Frequency")
+        plt.legend(loc='upper right')
+
+        with open(f"data/{acronym}graph_delivery_charges_hist_NUM_BOYS_{NUM_BOYS}_BIKE_SPEED_{BIKE_SPEED}__NUM_BOYS_PER_COMPANY_{NUM_BOYS_PER_COMPANY}_NUM_OF_COMPANIES_{NUM_OF_COMPANIES}.pkl", 'wb') as file:
+            pkl.dump(fig,file)
+
+        fig = plt.figure('Customer Ratings Histogram')
+        plt.title(f"NUM_BOYS = {NUM_BOYS}, NUM_BOYS_PER_COMPANY = {NUM_BOYS_PER_COMPANY}, BIKE_SPEED = {BIKE_SPEED}, NUM_OF_COMPANIES = {NUM_OF_COMPANIES}")
+        plt.hist([rating, rating2], bins2, label=['Decentralised', 'Centralised'])
+        plt.xlabel("Customer Ratings for a given order")
+        plt.ylabel("Frequency")
+        plt.legend(loc='upper right')
+
+        with open(f"data/{acronym}graph_customer_rating_hist_NUM_BOYS_{NUM_BOYS}_BIKE_SPEED_{BIKE_SPEED}__NUM_BOYS_PER_COMPANY_{NUM_BOYS_PER_COMPANY}_NUM_OF_COMPANIES_{NUM_OF_COMPANIES}.pkl", 'wb') as file:
+            pkl.dump(fig,file)
+        
+
+
+
+
+
+
+
 # mean, min, max, median, sum
     arrays = [
-        np.array(["Distance", "Distance", "Distance", "Distance", "Distance", "Wait Time", "Wait Time", "Wait Time", "Wait Time", "Wait Time", 'Average']),
-        np.array(["Min", "Median", "Max", "Sum", "Average", "Min", "Median", "Max", "Sum", "Average", 'Queue Length'])
+        np.array(["Distance", "Distance", "Distance", "Distance", "Distance", "Wait Time", "Wait Time", "Wait Time", "Wait Time", "Wait Time", 'Average', "Delivery Charges", "Delivery Charges", "Delivery Charges", "Delivery Charges", "Delivery Charges", "Customer Rating", "Customer Rating"]),
+        np.array(["Min", "Median", "Max", "Sum", "Average", "Min", "Median", "Max", "Sum", "Average", 'Queue Length', "Min", "Median", "Max", "Sum", "Average", "Median", "Average"])
     ]
 
     results = [
@@ -189,13 +251,24 @@ for NUM_BOYS_PER_COMPANY in [10]:
         [np.max(wait),np.max(wait2)],
         [np.sum(wait),np.sum(wait2)],
         [np.average(wait),np.average(wait2)],
-        [res,res2]
+        [res,res2],
+        [np.min(charges),np.min(charges2)],
+        [np.median(charges),np.median(charges2)],
+        [np.max(charges),np.max(charges2)],
+        [np.sum(charges),np.sum(charges2)],
+        [np.average(charges),np.average(charges2)],
+        [np.median(rating),np.median(rating2)],
+        [np.average(rating),np.average(rating2)],
     ]
 
     results = pd.DataFrame(results, index=arrays)
     results.columns = ['Decentralised', 'Centralised']
     results['Improvement'] = (results['Decentralised']/results['Centralised'])*100
     print(results)
+
+    FUEL_PRICE = 106.31
+    MILEAGE = 60
+    print(f'total amounts saved by restaurants is {((dist2.sum() - dist.sum())*FUEL_PRICE/MILEAGE) - (charges.sum() - charges2.sum())}')
 
 
 

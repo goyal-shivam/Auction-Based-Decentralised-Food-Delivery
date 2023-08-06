@@ -183,6 +183,8 @@ def perform_auction(riders_ind_list, order_cost):
         weights=[10,35,55]
         # weights=[10,20,70]
     )
+
+    delivery_charges = delivery_charges[0]
     
     return chosen_rider, delivery_charges
 
