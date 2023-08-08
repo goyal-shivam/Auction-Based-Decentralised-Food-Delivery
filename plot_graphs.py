@@ -267,8 +267,10 @@ for NUM_BOYS_PER_COMPANY in [10]:
     print(results)
 
     FUEL_PRICE = 106.31
-    MILEAGE = 60
+    MILEAGE = 40
     print(f'total amounts saved by restaurants is {((dist2.sum() - dist.sum())*FUEL_PRICE/MILEAGE) - (charges.sum() - charges2.sum())}')
+    print(f'amounts saved by lesser distance in decentralisation is {((dist2.sum() - dist.sum())*FUEL_PRICE/MILEAGE)}')
+    print(f'amount wasted on extra bids is {-(charges.sum() - charges2.sum())}')
 
 
 

@@ -58,7 +58,8 @@ def machine_predicted_bid(rider_ind, order_cost):
     return ceil((max_bid_res - min_bid_res)*(np.exp(0.5*rating) - 1)/(np.exp(0.5*5) - 1) + min_bid_res)
 
 def first_bid (machine_bid, order):
-    a = int((machine_bid - min_bid(order)) * 2 + min_bid(order))
+    # a = int((machine_bid - min_bid(order)) * 2 + min_bid(order))
+    a = int(machine_bid)
     if a < max_bid(order):
         return random.randint(a, max_bid(order))
     else:
@@ -66,10 +67,14 @@ def first_bid (machine_bid, order):
     
 def second_bid (machine_bid, order):
     a = first_bid(machine_bid, order)
-    return random.randint(machine_bid + 1, a)
+    if(machine_bid + 1 >= a):
+        return machine_bid
+    else:
+        # print(f'second bid -> machine_bid+1 = {machine_bid}, a = {a}')
+        return random.randint(machine_bid + 1, a)
 
 def third_bid (machine_bid, order):
-    return random.randint(int(machine_bid / 1.5), machine_bid)
+    return max(random.randint(int(machine_bid / 1.5), machine_bid), min_bid(order))
 
 def customer_rating(actual_wait_time, min_wait_time):
     '''
