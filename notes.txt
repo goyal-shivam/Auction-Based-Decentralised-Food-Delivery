@@ -75,3 +75,18 @@ inta sab nhi rakhte, sirf per order ka delivery charges and customer_rating rakh
         total rider_earnings, rider ratings ka histogram, and total value graph as the simulation progresses, customer_ratings ka histogram
 
 update average_customer_rating and average_rider_rating in both the simulations
+
+
+
+do 2 changes, make the riders demand bids based on their total time to reach the restaurant, plus distance from restaurant to customer. & customer rating should be 2.5 at 10 times or 8 times or 5 times the most optimised distance
+
+max distance travelled by the rider in our simulation is 100 kms
+    base fare is 40 rs, and then 20 rs per km
+
+    first_bid is from 300 to 600
+
+
+    make according to 40 kms
+        first bid is from 0 to 100, second is from 0 to 75, third is from 0 to 50
+
+        machine_predicted_bid goes from 0 to 40 only
