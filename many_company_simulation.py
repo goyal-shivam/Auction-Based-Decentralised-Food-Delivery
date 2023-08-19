@@ -10,6 +10,7 @@ from random import randrange
 from math import ceil
 import numpy as np
 import pickle as pkl
+import random
 
 NUM_BOYS_PER_COMPANY = 10 # 4 maybe
 NUM_OF_COMPANIES = 20
@@ -50,6 +51,9 @@ def machine_predicted_bid(rider_ind, order_cost):
     max_bid_res = max_bid(order_cost)
     
     return ceil((max_bid_res - min_bid_res)*(np.exp(0.5*rating) - 1)/(np.exp(0.5*5) - 1) + min_bid_res)
+
+def third_bid (machine_bid, order):
+    return max(random.randint(int(machine_bid / 1.5), machine_bid), min_bid(order))
 
 def customer_rating(actual_wait_time, min_wait_time):
     '''
@@ -230,7 +234,7 @@ class Customer:
         actual_wait_time = self.env.now-self.start_time
         ORDER_DATA.append((dist1+dist2, actual_wait_time))
         rating_by_customer = customer_rating(actual_wait_time, time2)
-        DELIVERY_CHARGES_RATING.append((machine_predicted_bid(self.bike_ind, self.order_cost), rating_by_customer))
+        DELIVERY_CHARGES_RATING.append((third_bid(self.bike_ind, self.order_cost), rating_by_customer))
         update_rider_rating(rating_by_customer, self.bike_ind)
         print(f'{self.order_num}, ', end='',flush=True)
 

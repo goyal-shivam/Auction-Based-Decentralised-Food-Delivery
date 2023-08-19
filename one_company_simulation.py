@@ -116,7 +116,7 @@ def generate_bikers_ind_list(lat,long,num,time_now):
         if(time_to_reach <=time_now):
             time_to_reach = time_now
 
-        time_to_reach += man_dist(BOYS[i]['lat'], BOYS[i]['long'], lat, long)
+        time_to_reach += ceil(man_dist(BOYS[i]['lat'], BOYS[i]['long'], lat, long)/BIKE_SPEED*60)
         reach_by.append((i, time_to_reach))
 
     reach_by.sort(key=lambda x:x[1])
@@ -161,35 +161,7 @@ def perform_auction(riders_ind_list, order_cost):
     chosen_rider = chosen_rider[0]
     chosen_rider_data = bids_df.loc[chosen_rider]
     
-    # print('----'*10)
-    # print(bids_df.columns)
-    # print('----'*10)
-    # print(chosen_rider)
-    # print('----'*10)
-    # print(chosen_rider_data)
-    # print('----'*10)
-    # pd.options.display.max_columns = None
-    # print(bids_df)
-    # print('----'*10)
-
-    delivery_charges = random.choices(
-        [
-            # bids_df[chosen_rider]['first_bid'],
-            # bids_df[chosen_rider]['second_bid'],
-            # bids_df[chosen_rider]['third_bid'],
-            # bids_df.iat[chosen_rider, 2],
-            # bids_df.iat[chosen_rider, 3],
-            # bids_df.iat[chosen_rider, 4],
-            chosen_rider_data['first_bid'],
-            chosen_rider_data['second_bid'],
-            chosen_rider_data['third_bid'],
-        ],
-        # weights=[1,9,90]
-        weights=[10,35,55]
-        # weights=[10,20,70]
-    )
-
-    delivery_charges = delivery_charges[0]
+    delivery_charges = chosen_rider_data['third_bid']
     
     return chosen_rider, delivery_charges
 
