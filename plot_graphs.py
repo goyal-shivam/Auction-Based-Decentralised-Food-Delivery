@@ -264,7 +264,7 @@ for NUM_BOYS_PER_COMPANY in [10]:
     results = pd.DataFrame(results, index=arrays)
     results.columns = ['Decentralised', 'Centralised']
     results['Improvement'] = (results['Decentralised']/results['Centralised'])*100
-    print(results)
+    print(results.round(2))
 
     FUEL_PRICE = 106.31
     MILEAGE = 40

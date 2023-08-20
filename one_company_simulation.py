@@ -48,33 +48,46 @@ def min_bid (order):
 def max_bid (order):
     return ceil(order * 0.2)
 
-def machine_predicted_bid(rider_ind, order_cost):
+def dist_travelled(rider_ind, lat, long, client_lat, client_long):
+    global BOYS
+
+    total_dist = 0
+    total_dist += ceil(man_dist(BOYS[i]['lat'], BOYS[i]['long'], lat, long))
+    total_dist += ceil(man_dist(lat, long, client_lat, client_long))
+
+    return total_dist
+
+def machine_predicted_bid(total_dist, order_cost):
     # rider_ind is the index of the delivery boy in the BOYS array
     
-    rating = BOYS[rider_ind]['rating']/1000
     min_bid_res = min_bid(order_cost)
     max_bid_res = max_bid(order_cost)
-    
-    return ceil((max_bid_res - min_bid_res)*(np.exp(0.5*rating) - 1)/(np.exp(0.5*5) - 1) + min_bid_res)
 
-def first_bid (machine_bid, order):
-    # a = int((machine_bid - min_bid(order)) * 2 + min_bid(order))
-    a = int(machine_bid)
-    if a < max_bid(order):
-        return random.randint(a, max_bid(order))
-    else:
-        return int(max_bid(order))
+    return ceil((max_bid_res - min_bid_res)*0.5*total_dist/40) + min_bid_res
     
-def second_bid (machine_bid, order):
-    a = first_bid(machine_bid, order)
-    if(machine_bid + 1 >= a):
-        return machine_bid
-    else:
-        # print(f'second bid -> machine_bid+1 = {machine_bid}, a = {a}')
-        return random.randint(machine_bid + 1, a)
+def first_bid(total_dist, order_cost):
+    # rider_ind is the index of the delivery boy in the BOYS array
+    
+    min_bid_res = min_bid(order_cost)
+    max_bid_res = max_bid(order_cost)
 
-def third_bid (machine_bid, order):
-    return max(random.randint(int(machine_bid / 1.5), machine_bid), min_bid(order))
+    return ceil((max_bid_res - min_bid_res)*1.0*total_dist/40) + min_bid_res
+    
+def second_bid(total_dist, order_cost):
+    # rider_ind is the index of the delivery boy in the BOYS array
+    
+    min_bid_res = min_bid(order_cost)
+    max_bid_res = max_bid(order_cost)
+
+    return ceil((max_bid_res - min_bid_res)*0.75*total_dist/40) + min_bid_res
+
+def third_bid(total_dist, order_cost):
+    # rider_ind is the index of the delivery boy in the BOYS array
+    
+    min_bid_res = min_bid(order_cost)
+    max_bid_res = max_bid(order_cost)
+
+    return ceil((max_bid_res - min_bid_res)*0.5*total_dist/40) + min_bid_res
 
 def customer_rating(actual_wait_time, min_wait_time):
     '''
@@ -127,7 +140,7 @@ def generate_bikers_ind_list(lat,long,num,time_now):
 
     return result
 
-def perform_auction(riders_ind_list, order_cost):
+def perform_auction(riders_ind_list, order_cost, lat, long, client_lat, client_long):
     min_bid_res = min_bid(order_cost)
     max_bid_res = max_bid(order_cost)
     machine_predicted_bid_res = []
@@ -137,10 +150,11 @@ def perform_auction(riders_ind_list, order_cost):
     ratings = []
 
     for i in riders_ind_list:
-        machine_predicted_bid_res.append(int(machine_predicted_bid(i, order_cost)))
-        first_bid_res.append(int(first_bid(machine_predicted_bid_res[-1], order_cost)))
-        second_bid_res.append(int(second_bid(machine_predicted_bid_res[-1], order_cost)))
-        third_bid_res.append(int(third_bid(machine_predicted_bid_res[-1], order_cost)))
+        curr_dist = dist_travelled(i, lat, long, client_lat, client_long)
+        machine_predicted_bid_res.append(int(machine_predicted_bid(curr_dist, order_cost)))
+        first_bid_res.append(int(first_bid(curr_dist, order_cost)))
+        second_bid_res.append(int(second_bid(curr_dist, order_cost)))
+        third_bid_res.append(int(third_bid(curr_dist, order_cost)))
         ratings.append(BOYS[i]['rating'])
 
     bids = {
@@ -300,7 +314,7 @@ class Customer:
 
         # self.bike_ind, self.bike_reach_restaurant_at, dist1 = get_index_of_nearest_boy(self.res_lat, self.res_long, self.env.now, self.order_num)
 
-        self.bike_ind, self.delivery_charges = perform_auction(generate_bikers_ind_list(self.res_lat, self.res_long, NUM_BOYS_IN_AUCTION, self.env.now), self.order_cost)
+        self.bike_ind, self.delivery_charges = perform_auction(generate_bikers_ind_list(self.res_lat, self.res_long, NUM_BOYS_IN_AUCTION, self.env.now), self.order_cost, self.res_lat, self.res_long, self.client_lat, self.client_long)
 
         dist1 = man_dist(self.res_lat, self.res_long, BOYS[self.bike_ind]['lat'], BOYS[self.bike_ind]['long'])
         self.bike_reach_restaurant_at = BOYS[self.bike_ind]['free_at']
