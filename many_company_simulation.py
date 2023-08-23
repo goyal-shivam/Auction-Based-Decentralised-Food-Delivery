@@ -66,8 +66,8 @@ def customer_rating(actual_wait_time, min_wait_time):
     min_wait_time is the time required for the delivery boy to travel from restaurant to client location
     '''
 
-    # here 10-1 in the formula specifies that when wait_time is 10 times the minimum possible, the rating is 2.5
-    return 5*(np.exp(-((actual_wait_time-min_wait_time)/min_wait_time/(10-1)*np.log(2))))
+    # here 5-1 in the formula specifies that when wait_time is 5 times the minimum possible, the rating is 2.5
+    return 5*(np.exp(-((actual_wait_time-min_wait_time)/min_wait_time/(5-1)*np.log(2))))
 
 def update_rider_rating(customer_rating, rider_ind):
     global AVERAGE_RIDER_RATING, AVERAGE_CUSTOMER_RATING, NUM_ORDERS_DONE, BOYS
